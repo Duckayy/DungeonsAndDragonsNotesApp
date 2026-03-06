@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D&D Notes</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #1a1410;
+      --surface:   #251e17;
+      --card:      #2e2519;
+      --border:    #4a3728;
+      --accent:    #c9a84c;
+      --accent2:   #8b4513;
+      --text:      #e8d5b0;
+      --text-muted:#9b8870;
+      --danger:    #c0392b;
+      --radius:    8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Georgia', serif;
+      min-height: 100vh;
+      padding: 24px 16px 64px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(201,168,76,0.3);
+    }
+
+    header p {
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 12px auto 0;
+      width: 60%;
+    }
+
+    /* ── New list bar ─────────────────────────── */
+    .new-list-bar {
+      display: flex;
+      gap: 10px;
+      max-width: 640px;
+      margin: 0 auto 32px;
+    }
+
+    .new-list-bar input {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .new-list-bar input::placeholder { color: var(--text-muted); }
+    .new-list-bar input:focus { border-color: var(--accent); }
+
+    /* ── Buttons ──────────────────────────────── */
+    button {
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      border-radius: var(--radius);
+      transition: opacity .15s, transform .1s;
+    }
+
+    button:active { transform: scale(.96); }
+    button:disabled { opacity: .45; cursor: default; }
+
+    .btn-primary {
+      padding: 10px 20px;
+      background: var(--accent);
+      color: #1a1410;
+      font-weight: bold;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover:not(:disabled) { opacity: .85; }
+
+    .btn-ghost {
+      padding: 4px 10px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
+
+    .btn-danger {
+      padding: 4px 8px;
+      background: transparent;
+      color: var(--danger);
+      font-size: 0.8rem;
+      border: 1px solid transparent;
+    }
+
+    .btn-danger:hover { border-color: var(--danger); background: rgba(192,57,43,.1); }
+
+    /* ── Lists grid ───────────────────────────── */
+    .lists-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ── List card ────────────────────────────── */
+    .list-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      flex: 1;
+      font-size: 1.05rem;
+      color: var(--accent);
+      word-break: break-word;
+    }
+
+    .card-title-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 1.05rem;
+      font-family: inherit;
+      outline: none;
+      padding: 2px 0;
+    }
+
+    .card-body { padding: 12px 14px; flex: 1; }
+
+    /* ── Item list ────────────────────────────── */
+    .item-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color .15s;
+    }
+
+    .item-row:hover { border-color: var(--text-muted); }
+
+    .item-bullet {
+      color: var(--accent);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .item-text {
+      flex: 1;
+      font-size: 0.92rem;
+      word-break: break-word;
+    }
+
+    .item-text-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--accent);
+      color: var(--text);
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      padding: 1px 0;
+    }
+
+    /* ── Add item row ─────────────────────────── */
+    .add-item-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .add-item-row input {
+      flex: 1;
+      padding: 7px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .add-item-row input::placeholder { color: var(--text-muted); }
+    .add-item-row input:focus { border-color: var(--accent); }
+
+    .add-item-row .btn-primary {
+      padding: 7px 14px;
+      font-size: 0.9rem;
+    }
+
+    /* ── Empty state ──────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 1rem; }
+
+    /* ── Item count badge ─────────────────────── */
+    .badge {
+      font-size: 0.72rem;
+      background: var(--accent2);
+      color: var(--text);
+      padding: 2px 7px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    /* ── Helpers ──────────────────────────────── */
+    const uid = () => Math.random().toString(36).slice(2, 9);
+
+    const loadState = () => {
+      try { return JSON.parse(localStorage.getItem('dnd-lists') || 'null'); }
+      catch { return null; }
+    };
+
+    const saveState = (lists) =>
+      localStorage.setItem('dnd-lists', JSON.stringify(lists));
+
+    /* ── Default data ─────────────────────────── */
+    const defaults = [
+      {
+        id: uid(),
+        title: 'Party Members',
+        items: [
+          { id: uid(), text: 'Aelindra – Elf Ranger' },
+          { id: uid(), text: 'Brom Stoneback – Dwarf Fighter' },
+        ],
+      },
+      {
+        id: uid(),
+        title: 'Quest Items',
+        items: [
+          { id: uid(), text: 'Ancient Map Fragment' },
+          { id: uid(), text: 'Sealed Letter from the King' },
+        ],
+      },
+    ];
+
+    /* ── EditableText ─────────────────────────── */
+    function EditableText({ value, onChange, className, inputClassName, placeholder }) {
+      const [editing, setEditing] = useState(false);
+      const [draft, setDraft] = useState(value);
+      const inputRef = useRef(null);
+
+      useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+
+      const commit = () => {
+        setEditing(false);
+        const trimmed = draft.trim();
+        if (trimmed && trimmed !== value) onChange(trimmed);
+        else setDraft(value);
+      };
+
+      if (editing) {
+        return (
+          <input
+            ref={inputRef}
+            className={inputClassName}
+            value={draft}
+            onChange={e => setDraft(e.target.value)}
+            onBlur={commit}
+            onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') { setEditing(false); setDraft(value); } }}
+            placeholder={placeholder}
+          />
+        );
+      }
+
+      return (
+        <span
+          className={className}
+          title="Click to rename"
+          onClick={() => { setDraft(value); setEditing(true); }}
+          style={{ cursor: 'text' }}
+        >
+          {value}
+        </span>
+      );
+    }
+
+    /* ── ListCard ─────────────────────────────── */
+    function ListCard({ list, onRename, onDelete, onAddItem, onRemoveItem, onRenameItem }) {
+      const [newItem, setNewItem] = useState('');
+      const inputRef = useRef(null);
+
+      const handleAdd = () => {
+        const trimmed = newItem.trim();
+        if (!trimmed) return;
+        onAddItem(list.id, trimmed);
+        setNewItem('');
+        inputRef.current?.focus();
+      };
+
+      return (
+        <div className="list-card">
+          <div className="card-header">
+            <EditableText
+              value={list.title}
+              onChange={val => onRename(list.id, val)}
+              className="card-title"
+              inputClassName="card-title-input"
+              placeholder="List name"
+            />
+            {list.items.length > 0 && (
+              <span className="badge">{list.items.length}</span>
+            )}
+            <button className="btn-danger" onClick={() => onDelete(list.id)} title="Delete list">✕</button>
+          </div>
+
+          <div className="card-body">
+            {list.items.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '12px' }}>
+                No entries yet. Add one below.
+              </p>
+            ) : (
+              <ul className="item-list">
+                {list.items.map(item => (
+                  <li key={item.id} className="item-row">
+                    <span className="item-bullet">⚔</span>
+                    <EditableText
+                      value={item.text}
+                      onChange={val => onRenameItem(list.id, item.id, val)}
+                      className="item-text"
+                      inputClassName="item-text-input"
+                      placeholder="Entry text"
+                    />
+                    <button className="btn-danger" onClick={() => onRemoveItem(list.id, item.id)} title="Remove entry">✕</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div className="add-item-row">
+              <input
+                ref={inputRef}
+                value={newItem}
+                onChange={e => setNewItem(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleAdd()}
+                placeholder="Add entry…"
+              />
+              <button className="btn-primary" onClick={handleAdd} disabled={!newItem.trim()}>Add</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ── App ──────────────────────────────────── */
+    function App() {
+      const [lists, setLists] = useState(() => loadState() ?? defaults);
+      const [newTitle, setNewTitle] = useState('');
+
+      useEffect(() => saveState(lists), [lists]);
+
+      const updateLists = (fn) => setLists(prev => { const next = fn(prev); saveState(next); return next; });
+
+      const createList = () => {
+        const trimmed = newTitle.trim();
+        if (!trimmed) return;
+        updateLists(prev => [...prev, { id: uid(), title: trimmed, items: [] }]);
+        setNewTitle('');
+      };
+
+      const renameList = (id, title) =>
+        updateLists(prev => prev.map(l => l.id === id ? { ...l, title } : l));
+
+      const deleteList = (id) =>
+        updateLists(prev => prev.filter(l => l.id !== id));
+
+      const addItem = (listId, text) =>
+        updateLists(prev => prev.map(l =>
+          l.id === listId ? { ...l, items: [...l.items, { id: uid(), text }] } : l
+        ));
+
+      const removeItem = (listId, itemId) =>
+        updateLists(prev => prev.map(l =>
+          l.id === listId ? { ...l, items: l.items.filter(i => i.id !== itemId) } : l
+        ));
+
+      const renameItem = (listId, itemId, text) =>
+        updateLists(prev => prev.map(l =>
+          l.id === listId
+            ? { ...l, items: l.items.map(i => i.id === itemId ? { ...i, text } : i) }
+            : l
+        ));
+
+      return (
+        <>
+          <header>
+            <h1>⚔ D&D Notes ⚔</h1>
+            <p>Your customizable lists for campaigns, quests, and beyond.</p>
+            <hr className="divider" />
+          </header>
+
+          <div className="new-list-bar">
+            <input
+              value={newTitle}
+              onChange={e => setNewTitle(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && createList()}
+              placeholder="New list name (e.g. Spells, NPCs, Locations…)"
+            />
+            <button className="btn-primary" onClick={createList} disabled={!newTitle.trim()}>
+              + New List
+            </button>
+          </div>
+
+          {lists.length === 0 ? (
+            <div className="empty-state">
+              <div className="icon">📜</div>
+              <p>No lists yet. Create one above to get started.</p>
+            </div>
+          ) : (
+            <div className="lists-grid">
+              {lists.map(list => (
+                <ListCard
+                  key={list.id}
+                  list={list}
+                  onRename={renameList}
+                  onDelete={deleteList}
+                  onAddItem={addItem}
+                  onRemoveItem={removeItem}
+                  onRenameItem={renameItem}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
