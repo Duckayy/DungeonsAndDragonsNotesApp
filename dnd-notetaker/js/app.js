@@ -1,8 +1,10 @@
 function updateDashboard(){
     //get counts
-    listItems("session_").length
-    listItems("char_").length
+    sessionCnt = listItems("session_").length
+    charCnt = listItems("char_").length
     //update HTML elements
+    document.getElementById("session-count").textContent = sessionCnt
+    document.getElementById("char-count").textContent = charCnt
 }
 
 // runs when the page has fully loaded
