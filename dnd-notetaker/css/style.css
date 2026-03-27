@@ -1,0 +1,30 @@
+:root {
+    --color-bg: #2b1d0e;
+    --color-text: #c0ac82;
+    --color-accent: #8b0000;
+    --color-nav: #1a0f07;
+}
+ body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: sans-serif;
+    margin: 0; 
+ }
+
+ nav {
+    background-color: var(--color-nav);
+    padding: 1rem;
+    font-size: 1.2rem;
+ }
+ nav a{
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 1rem;
+ }
+ .card {
+    background-color: #5b3a1f;
+    padding: 0.5rem 1rem 1rem 1rem;
+    margin: 0.5rem;
+    border-radius:  8px;
+ }
