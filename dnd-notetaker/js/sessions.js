@@ -1,13 +1,14 @@
 function renderSessions(){
     const container = document.getElementById("session-list");
-    const sessions = listItems("sessions_");
+    const sessionKeys = listItems("session_");
 
-    if (!sessions || sessions.length === 0){
+    if (!sessionKeys || sessionKeys.length === 0){
         container.innerHTML = "<p>No sessions yet - create one! </p>";
         return;
     }
 
-    sessions.forEach(session => {
+    sessionKeys.forEach(key => {
+        const session = loadItem(key);
         const cardHTML = `
         <div class="session-card">
                 <h2>${session.title}</h2>
@@ -15,5 +16,8 @@ function renderSessions(){
                 <p>${session.summary.substring(0, 100)}...</p>
             </div>
         `;
+
+        container.insertAdjacentHTML("beforeend", cardHTML);
     });
 }
+window.onload = renderSessions;
