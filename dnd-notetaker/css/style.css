@@ -28,3 +28,35 @@
     margin: 0.5rem;
     border-radius:  8px;
  }
+ .session-card {
+    background-color: #5b3a1f; /* matches .card */
+    padding: 0.5rem 1rem 1rem 1rem;
+    margin: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer; /* signals to the user it's clickable */
+    border: 1px solid var(--color-accent);
+}
+
+/* Full summary is hidden by default */
+.session-card .summary-full {
+    display: none;
+}
+
+/* Preview is hidden once expanded */
+.session-card.expanded .summary-preview {
+    display: none;
+}
+
+/* Full summary shows once expanded */
+.session-card.expanded .summary-full {
+    display: block;
+}
+ .btn-new-session {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
