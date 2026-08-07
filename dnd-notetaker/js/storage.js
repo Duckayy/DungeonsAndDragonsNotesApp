@@ -37,5 +37,43 @@ function listItems(prefix){
     }
 
     return myList
-    
+
+}
+
+const DEFAULT_CAMPAIGN_ID = "campaign_default";
+
+// Makes sure a "Default Campaign" exists and every session has a campaignId.
+// Safe to call on every page load - does nothing once everything is migrated.
+function migrateSessionsToDefaultCampaign(){
+    const sessionKeys = listItems("session_");
+    const needsDefault = sessionKeys.some(key => !loadItem(key).campaignId);
+
+    if (needsDefault && !loadItem(DEFAULT_CAMPAIGN_ID)){
+        saveItem(DEFAULT_CAMPAIGN_ID, {
+            id: DEFAULT_CAMPAIGN_ID,
+            name: "Default Campaign",
+            description: "Sessions created before campaigns existed.",
+            createdAt: Date.now()
+        });
+    }
+
+    sessionKeys.forEach(key => {
+        const session = loadItem(key);
+        if (!session.campaignId){
+            session.campaignId = DEFAULT_CAMPAIGN_ID;
+            saveItem(key, session);
+        }
+    });
+}
+
+// "pages/" when called from the site root (index.html), "" when already
+// inside pages/ - lets shared JS build correct relative links from either.
+function pagesPrefix(){
+    return window.location.pathname.includes("/pages/") ? "" : "pages/";
+}
+
+// Reads ?campaign=<id> from the current page's URL, or null if absent.
+function getCampaignIdFromUrl(){
+    const params = new URLSearchParams(window.location.search);
+    return params.get("campaign");
 }
