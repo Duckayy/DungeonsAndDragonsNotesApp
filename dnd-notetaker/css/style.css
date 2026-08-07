@@ -35,6 +35,8 @@
     border-radius: 8px;
     cursor: pointer; /* signals to the user it's clickable */
     border: 1px solid var(--color-accent);
+    max-width: 300px; /* ← add this, adjust to taste */
+
 }
 
 /* Full summary is hidden by default */
