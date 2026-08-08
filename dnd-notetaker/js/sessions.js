@@ -1,13 +1,3 @@
-// Basic HTML-escaping so session text can't break card markup or attributes.
-function escapeHtml(str){
-    return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
 function renderSessions(){
     const container = document.getElementById("session-list");
     const campaignId = getCampaignIdFromUrl();
@@ -29,45 +19,50 @@ function renderSessions(){
     }
 
     container.innerHTML = "";
-
     sessionKeys.forEach(key => {
         const session = loadItem(key);
-        const summaryText = session.summary || "No summary written yet.";
-
-        const cardHTML = `
-        <div class="session-card" data-id="${session.id}">
-                <h2 class="field-title">${escapeHtml(session.title)}</h2>
-                <p class="field-date">${escapeHtml(session.date)}</p>
-                <p class="summary-preview">${escapeHtml(summaryText.substring(0, 100))}...</p>
-                <p class="summary-full">${escapeHtml(summaryText)}</p>
-
-                <div class="edit-fields">
-                    <label>Title</label>
-                    <input type="text" class="edit-title" value="${escapeHtml(session.title)}">
-                    <label>Date</label>
-                    <input type="date" class="edit-date" value="${escapeHtml(session.date || "")}">
-                    <label>Summary</label>
-                    <textarea class="edit-summary">${escapeHtml(summaryText)}</textarea>
-                    <div class="edit-actions">
-                        <button type="button" class="save-session-btn">Save</button>
-                        <button type="button" class="cancel-edit-btn">Cancel</button>
-                        <button type="button" class="delete-session-btn">Delete</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        container.insertAdjacentHTML("beforeend", cardHTML);
+        container.insertAdjacentHTML("beforeend", buildSessionCardHTML(session, false));
     });
 
     attachSessionCardListeners(container);
 }
 
-// Attaches all card-level listeners after cards are added to the DOM.
-function attachSessionCardListeners(container){
-    const cards = container.querySelectorAll(".session-card");
+// isNew renders the card already in edit mode with no Delete button, for the
+// "create by filling in a blank card" flow.
+function buildSessionCardHTML(session, isNew){
+    const summaryText = session.summary || "No summary written yet.";
+    const cardClasses = "session-card" + (isNew ? " editing new-card" : "");
 
-    cards.forEach(card => {
+    return `
+    <div class="${cardClasses}" data-id="${session.id || ""}">
+            <h2 class="field-title">${escapeHtml(session.title)}</h2>
+            <p class="field-date">${escapeHtml(session.date || "")}</p>
+            <p class="summary-preview">${escapeHtml(summaryText.substring(0, 100))}...</p>
+            <p class="summary-full">${escapeHtml(summaryText)}</p>
+
+            <div class="edit-fields">
+                <label>Title</label>
+                <input type="text" class="edit-title" value="${escapeHtml(session.title)}">
+                <label>Date</label>
+                <input type="date" class="edit-date" value="${escapeHtml(session.date || "")}">
+                <label>Summary</label>
+                <textarea class="edit-summary">${escapeHtml(session.summary || "")}</textarea>
+                <div class="edit-actions">
+                    <button type="button" class="save-btn">Save</button>
+                    <button type="button" class="cancel-btn">Cancel</button>
+                    <button type="button" class="delete-btn">Delete</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Attaches listeners to already-saved session cards (expand/edit/delete).
+// Draft cards (still unsaved) get their own listeners from addNewSessionCard.
+function attachSessionCardListeners(container){
+    container.querySelectorAll(".session-card").forEach(card => {
+        if (card.classList.contains("new-card")) return;
+
         // Expand/collapse the summary on click
         card.addEventListener("click", () => {
             if (card.classList.contains("editing")) return;
@@ -82,17 +77,17 @@ function attachSessionCardListeners(container){
                 });
             });
 
-        card.querySelector(".save-session-btn").addEventListener("click", (event) => {
+        card.querySelector(".save-btn").addEventListener("click", (event) => {
             event.stopPropagation();
             saveEditedSession(card);
         });
 
-        card.querySelector(".cancel-edit-btn").addEventListener("click", (event) => {
+        card.querySelector(".cancel-btn").addEventListener("click", (event) => {
             event.stopPropagation();
             card.classList.remove("editing");
         });
 
-        card.querySelector(".delete-session-btn").addEventListener("click", (event) => {
+        card.querySelector(".delete-btn").addEventListener("click", (event) => {
             event.stopPropagation();
             deleteSession(card);
         });
@@ -123,49 +118,51 @@ function deleteSession(card){
 
 // Disables session creation when no campaign is selected (nothing to attach the session to).
 function setNewSessionControlsEnabled(enabled){
-    const toggleBtn = document.getElementById("toggle-new-session-btn");
-    if (toggleBtn) toggleBtn.hidden = !enabled;
+    const createBtn = document.getElementById("new-session-btn");
+    if (createBtn) createBtn.hidden = !enabled;
+}
 
-    if (!enabled){
-        document.getElementById("new-session-form").hidden = true;
+// "+ Create New Session" - inserts a blank card already in edit mode.
+function addNewSessionCard(){
+    const container = document.getElementById("session-list");
+    if (!container) return;
+
+    if (!container.querySelector(".session-card")){
+        container.innerHTML = "";
     }
+
+    const draftHTML = buildSessionCardHTML({ id: "", title: "", date: "", summary: "" }, true);
+    container.insertAdjacentHTML("afterbegin", draftHTML);
+
+    const draftCard = container.querySelector(".session-card.new-card");
+    attachDraftSessionCardListeners(draftCard);
+    draftCard.querySelector(".edit-title").focus();
 }
 
-// Shows/hides the new-session form when the toggle button is clicked
-function toggleNewSessionForm(){
-    const form = document.getElementById("new-session-form");
-    form.hidden = !form.hidden; // flips true/false each click
-}
+function attachDraftSessionCardListeners(card){
+    card.querySelector(".save-btn").addEventListener("click", () => {
+        const campaignId = getCampaignIdFromUrl();
+        if (!campaignId) return; // button is hidden without a campaign, but guard anyway
 
-// Handles the new-session form submit, now inline on sessions.html
-function handleNewSessionSubmit(event){
-    event.preventDefault(); // stop the browser's default full-page-reload form submission
+        const session = {
+            id: "session_" + Date.now(),
+            campaignId: campaignId,
+            title: card.querySelector(".edit-title").value.trim() || "Untitled Session",
+            date: card.querySelector(".edit-date").value,
+            summary: card.querySelector(".edit-summary").value.trim() || "No summary written yet.",
+            createdAt: Date.now()
+        };
 
-    const campaignId = getCampaignIdFromUrl();
-    if (!campaignId) return; // form is hidden without a campaign, but guard anyway
+        saveItem(session.id, session);
+        renderSessions();
+    });
 
-    const titleInput = document.getElementById("title");
-    const dateInput = document.getElementById("date");
-    const inGameDateInput = document.getElementById("inGameDate");
-    const summaryInput = document.getElementById("summary");
-    const tagsInput = document.getElementById("tags");
-
-    const session = {
-        id: "session_" + Date.now(),
-        campaignId: campaignId,
-        title: titleInput.value.trim() || "Untitled Session",
-        date: dateInput.value,
-        inGameDate: inGameDateInput.value,
-        summary: summaryInput.value.trim() || "No summary written yet.",
-        tags: tagsInput.value.split(",").map(s => s.trim()).filter(Boolean),
-        createdAt: Date.now()
-    };
-
-    saveItem(session.id, session);
-
-    event.target.reset(); // clears all form fields back to blank
-    document.getElementById("new-session-form").hidden = true; // hide form again after save
-    renderSessions(); // re-render the list in place to show the new card — no page redirect needed
+    card.querySelector(".cancel-btn").addEventListener("click", () => {
+        card.remove();
+        if (!document.querySelector("#session-list .session-card")){
+            renderSessions();
+        }
+    });
 }
 
 window.onload = function() {
@@ -174,13 +171,8 @@ window.onload = function() {
         renderSessions();
     }
 
-    const toggleBtn = document.getElementById("toggle-new-session-btn");
-    if (toggleBtn) {
-        toggleBtn.addEventListener("click", toggleNewSessionForm);
-    }
-
-    const newSessionForm = document.getElementById("new-session-form");
-    if (newSessionForm) {
-        newSessionForm.addEventListener("submit", handleNewSessionSubmit);
+    const createBtn = document.getElementById("new-session-btn");
+    if (createBtn) {
+        createBtn.addEventListener("click", addNewSessionCard);
     }
 };
