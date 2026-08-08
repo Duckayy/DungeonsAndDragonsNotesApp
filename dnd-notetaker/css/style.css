@@ -63,8 +63,9 @@
     margin-bottom: 1rem;
 }
 
-/* Campaign cards - same look as session cards */
-.campaign-card {
+/* Campaign and character cards - same look as session cards */
+.campaign-card,
+.character-card {
     background-color: #5b3a1f;
     padding: 0.5rem 1rem 1rem 1rem;
     margin: 0.5rem;
@@ -80,25 +81,55 @@
     font-size: 0.9rem;
 }
 
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+}
+
+.tag-pill {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
 /* Breadcrumb showing the active campaign, injected by nav.js */
 #nav-breadcrumb a {
     color: var(--color-text);
 }
 
-/* Edit mode for session cards */
-.session-card .edit-fields {
+/* Edit mode - shared by session, campaign, and character cards */
+.session-card .edit-fields,
+.campaign-card .edit-fields,
+.character-card .edit-fields {
     display: none;
 }
 
 .session-card.editing .field-title,
 .session-card.editing .field-date,
 .session-card.editing .summary-preview,
-.session-card.editing .summary-full {
+.session-card.editing .summary-full,
+.campaign-card.editing .field-name,
+.campaign-card.editing .field-description,
+.campaign-card.editing .campaign-session-count,
+.character-card.editing .field-name,
+.character-card.editing .field-description,
+.character-card.editing .tag-list {
     display: none;
 }
 
-.session-card.editing .edit-fields {
+.session-card.editing .edit-fields,
+.campaign-card.editing .edit-fields,
+.character-card.editing .edit-fields {
     display: block;
+}
+
+/* Draft cards (still unsaved) have nothing to delete yet */
+.new-card .delete-btn {
+    display: none;
 }
 
 .edit-fields input,
@@ -120,18 +151,18 @@
     cursor: pointer;
 }
 
-.save-session-btn {
+.save-btn {
     background-color: var(--color-accent);
     color: var(--color-bg);
 }
 
-.cancel-edit-btn {
+.cancel-btn {
     background-color: transparent;
     color: var(--color-text);
     border: 1px solid var(--color-text);
 }
 
-.delete-session-btn {
+.delete-btn {
     background-color: #a33;
     color: white;
     margin-left: auto;

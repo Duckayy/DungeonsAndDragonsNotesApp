@@ -77,3 +77,13 @@ function getCampaignIdFromUrl(){
     const params = new URLSearchParams(window.location.search);
     return params.get("campaign");
 }
+
+// Basic HTML-escaping so stored text can't break card markup or attributes.
+function escapeHtml(str){
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}

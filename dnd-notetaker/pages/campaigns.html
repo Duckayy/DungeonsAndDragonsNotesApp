@@ -8,33 +8,18 @@
 <body>
     <!-- page content -->
     <nav>
-        <a href="campaigns.html">Home</a>
+        <a href="../index.html">Home</a>
         <a href="campaigns.html">Campaigns</a>
-        <a href="sessions.html">Sessions</a>
-        <a href="world.html">World</a>
-        <a href="characters.html">Characters</a>
-        <span id="nav-breadcrumb"></span>
     </nav>
 
     <main>
         <h1>Campaigns</h1>
         <div id="campaign-list"></div>
-        <button id="toggle-new-campaign-btn">+ Create New Campaign</button>
-        <!-- Hidden by default via the "hidden" attribute; JS toggles this -->
-        <form id="new-campaign-form" hidden>
-            <label for="campaign-name">Name</label>
-            <input type="text" id="campaign-name" name="campaign-name">
-
-            <label for="campaign-description">Description</label>
-            <textarea name="campaign-description" id="campaign-description"></textarea>
-
-            <button type="submit">Save</button>
-        </form>
+        <button id="new-campaign-btn">+ Create New Campaign</button>
     </main>
 
     <!-- script tags here -->
     <script src="../js/storage.js"></script>
     <script src="../js/campaigns.js"></script>
-    <script src="../js/nav.js"></script>
 </body>
 </html>
