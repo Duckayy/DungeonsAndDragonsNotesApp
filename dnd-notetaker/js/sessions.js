@@ -33,11 +33,21 @@ function buildSessionCardHTML(session, isNew){
     const summaryText = session.summary || "No summary written yet.";
     const cardClasses = "session-card" + (isNew ? " editing new-card" : "");
 
+    // Saved cards get a hover delete button + inline confirm; drafts don't
+    // (nothing to delete yet - see the old .new-card .delete-btn CSS rule).
+    const deleteControlsHTML = isNew ? "" : `
+            <button type="button" class="card-delete-btn" data-testid="session-card-delete-button">Delete</button>
+            <div class="delete-confirm" data-testid="session-card-delete-confirm">
+                <span>Delete this session?</span>
+                <button type="button" class="confirm-delete-btn" data-testid="session-card-confirm-delete-button">Confirm</button>
+                <button type="button" class="cancel-delete-btn" data-testid="session-card-cancel-delete-button">Cancel</button>
+            </div>`;
+
     return `
     <div class="${cardClasses}" data-id="${session.id || ""}">
+            ${deleteControlsHTML}
             <h2 class="field-title">${escapeHtml(session.title)}</h2>
             <p class="field-date">${escapeHtml(session.date || "")}</p>
-            <p class="summary-preview">${escapeHtml(summaryText.substring(0, 100))}...</p>
             <p class="summary-full">${escapeHtml(summaryText)}</p>
 
             <div class="edit-fields">
@@ -57,62 +67,49 @@ function buildSessionCardHTML(session, isNew){
     `;
 }
 
-// Attaches listeners to already-saved session cards (expand/edit/delete).
-// Draft cards (still unsaved) get their own listeners from addNewSessionCard.
+// Attaches listeners to already-saved session cards: double-click opens the
+// session detail panel, hover-delete swaps to an inline confirm/cancel.
+// Draft cards (still unsaved) get their own listeners from addNewSessionCard -
+// the old double-click-to-edit-inline path is retired for saved cards.
 function attachSessionCardListeners(container){
     container.querySelectorAll(".session-card").forEach(card => {
         if (card.classList.contains("new-card")) return;
 
-        // Expand/collapse the summary on click
-        card.addEventListener("click", () => {
-            if (card.classList.contains("editing")) return;
-            card.classList.toggle("expanded");
+        card.addEventListener("dblclick", (event) => {
+            if (event.target.closest(".card-delete-btn, .delete-confirm")) return;
+            SessionPanel.open(card.dataset.id);
         });
 
-        // Double-clicking the visible text enters edit mode
-        card.querySelectorAll(".field-title, .field-date, .summary-preview, .summary-full")
-            .forEach(field => {
-                field.addEventListener("dblclick", () => {
-                    card.classList.add("editing");
-                });
-            });
-
-        card.querySelector(".save-btn").addEventListener("click", (event) => {
+        card.querySelector(".card-delete-btn").addEventListener("click", (event) => {
             event.stopPropagation();
-            saveEditedSession(card);
+            startDeleteConfirm(card, container);
         });
 
-        card.querySelector(".cancel-btn").addEventListener("click", (event) => {
+        card.querySelector(".confirm-delete-btn").addEventListener("click", (event) => {
             event.stopPropagation();
-            card.classList.remove("editing");
+            confirmDeleteSession(card);
         });
 
-        card.querySelector(".delete-btn").addEventListener("click", (event) => {
+        card.querySelector(".cancel-delete-btn").addEventListener("click", (event) => {
             event.stopPropagation();
-            deleteSession(card);
+            card.classList.remove("confirming-delete");
         });
     });
 }
 
-function saveEditedSession(card){
-    const sessionId = card.dataset.id;
-    const session = loadItem(sessionId);
-
-    session.title = card.querySelector(".edit-title").value.trim() || "Untitled Session";
-    session.date = card.querySelector(".edit-date").value;
-    session.summary = card.querySelector(".edit-summary").value.trim() || "No summary written yet.";
-
-    saveItem(sessionId, session);
-    renderSessions();
+// Only one card can be showing its delete confirmation at a time.
+function startDeleteConfirm(card, container){
+    container.querySelectorAll(".session-card.confirming-delete").forEach(other => {
+        if (other !== card) other.classList.remove("confirming-delete");
+    });
+    card.classList.add("confirming-delete");
 }
 
-function deleteSession(card){
+function confirmDeleteSession(card){
     const sessionId = card.dataset.id;
-    const session = loadItem(sessionId);
-
-    if (!window.confirm(`Delete "${session.title}"? This can't be undone.`)) return;
 
     deleteItem(sessionId);
+    SessionPanel.closeTab(sessionId);
     renderSessions();
 }
 
