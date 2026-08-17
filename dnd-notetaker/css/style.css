@@ -36,23 +36,63 @@
     cursor: pointer; /* signals to the user it's clickable */
     border: 1px solid var(--color-accent);
     max-width: 300px; /* ← add this, adjust to taste */
+    position: relative; /* anchors the hover delete button */
 
 }
 
-/* Full summary is hidden by default */
-.session-card .summary-full {
+/* Hover-delete button + inline confirm state (saved cards only, not drafts) */
+.session-card .card-delete-btn {
+    display: none;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: #a33;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+}
+
+.session-card:hover .card-delete-btn {
+    display: inline-block;
+}
+
+.session-card.confirming-delete .card-delete-btn {
     display: none;
 }
 
-/* Preview is hidden once expanded */
-.session-card.expanded .summary-preview {
+.session-card .delete-confirm {
     display: none;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-accent);
 }
 
-/* Full summary shows once expanded */
-.session-card.expanded .summary-full {
-    display: block;
+.session-card.confirming-delete .delete-confirm {
+    display: flex;
 }
+
+.delete-confirm button {
+    padding: 0.3rem 0.7rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-confirm .confirm-delete-btn {
+    background-color: var(--color-accent);
+    color: #fff;
+}
+
+.delete-confirm .cancel-delete-btn {
+    background-color: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-text);
+}
+
  .btn-new-session {
     display: inline-block;
     padding: 0.5rem 1rem;
@@ -166,4 +206,111 @@
     background-color: #a33;
     color: white;
     margin-left: auto;
+}
+
+/* Session Detail Panel - drawer, panes, tabs, split view (js/sessionPanel.js) */
+#session-panel-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    display: flex;
+    z-index: 50;
+}
+
+.panel-pane {
+    position: relative;
+    width: 380px;
+    min-width: 240px;
+    max-width: 90vw;
+    height: 100%;
+    background-color: var(--color-nav);
+    border-left: 2px solid var(--color-accent);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.4);
+}
+
+.pane-resize-handle {
+    position: absolute;
+    top: 0;
+    left: -4px;
+    width: 8px;
+    height: 100%;
+    cursor: ew-resize;
+}
+
+.pane-tab-bar {
+    display: flex;
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-accent);
+    overflow-x: auto;
+}
+
+.pane-tab {
+    padding: 0.5rem 0.75rem;
+    color: var(--color-text);
+    cursor: pointer;
+    border-right: 1px solid var(--color-nav);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.pane-tab.active-tab {
+    background-color: var(--color-nav);
+    border-bottom: 2px solid var(--color-accent);
+}
+
+.pane-tab-close {
+    color: var(--color-text);
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+.pane-tab-close:hover {
+    opacity: 1;
+}
+
+.pane-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.pane-content label {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.pane-content input,
+.pane-content textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-accent);
+    border-radius: 4px;
+    padding: 0.4rem;
+    margin-top: 0.2rem;
+}
+
+.pane-content textarea.panel-summary-input {
+    min-height: 200px;
+    resize: vertical;
+}
+
+/* Boundary drop zones for drag-to-split (BR6) - one before/between/after each pane */
+.pane-drop-zone {
+    width: 12px;
+    height: 100%;
+    background-color: transparent;
+}
+
+.pane-drop-zone.drop-zone-active {
+    background-color: var(--color-accent);
+    opacity: 0.5;
 }
