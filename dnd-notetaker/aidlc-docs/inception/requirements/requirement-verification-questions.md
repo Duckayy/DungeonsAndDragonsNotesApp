@@ -1,99 +1,82 @@
-# Requirements Clarification Questions — Sessions Page: Session Detail Card
+# Clarifying Questions — Full Stack Pivot (Cloud Storage + Version Control)
 
-Please answer each question by filling in the letter after `[Answer]:`. If none of the options fit, use the last option and describe your preference.
+Your last message expands the roadmap request from "plan the remaining localStorage-based phases" to
+"make this full stack" with cloud note storage and version control. This reverses a decision already
+logged in `CLAUDE.md` ("MVP-first: localStorage → backend later is intentional architecture, not a
+shortcut"). That's fine to change — but per the project's collaboration rule, I won't pick the backend,
+auth model, or version-control approach for you. Please answer below.
 
-## Question 1
-This request describes double-click opening a **side panel** to view/write a session's content. The project's existing decision log says sessions are "double-click-to-edit inline on the card" (editing happens in place, in the list). How should these relate?
+Fill in each `[Answer]:` tag with a letter (A, B, C...), or "E) Other" with a short description.
 
-A) Replace it — double-click now opens the side panel instead of inline editing; inline edit-on-card goes away
+---
 
-B) Keep both — single-click (or some other trigger) still does inline edit-on-card for quick tweaks (e.g. just the title), while double-click opens the side panel for the full writing experience
+### Q1: What does "version control" mean for this app?
+A) Git/GitHub for the codebase only — already in place, nothing new to build
+B) In-app revision history for notes (e.g., view/restore earlier versions of a session's summary or a character's notes)
+C) Both A and B
+D) Other (describe)
 
-C) The side panel *is* the new home for what used to be "edit mode" — same trigger (double-click), just a different UI (panel instead of inline)
+[Answer]:B
 
-D) Other (please describe after [Answer]: tag below)
+---
 
-[Answer]: A
+### Q2: Which cloud backend/database should the tech stack target?
+A) Supabase (Postgres + built-in auth + realtime) — this is the option CLAUDE.md already named as the likely migration target
+B) Firebase (Firestore + Auth) — also named in CLAUDE.md as an alternative
+C) Custom backend (e.g., Node/Express) + a separately hosted database
+D) Other (describe)
 
-## Question 2
-How should the side panel actually appear on screen (like OneNote's page view)?
+[Answer]:A
 
-A) Slide-in drawer from the right, overlaying part of the page; session list stays visible on the left/behind it
+---
 
-B) Split view — session list narrows to a sidebar/column, and the panel permanently occupies the rest of the screen while a session is open (closer to OneNote's actual layout: notebook sections on the left, page content filling the rest)
-
-C) Full-screen-ish modal that covers most of the page, session list hidden while it's open
-
-D) Other (please describe after [Answer]: tag below)
-
-[Answer]: A but you can reconfigure as in make it bigger by extending it
-
-## Question 3
-You called the card "reconfigurable" — what does that mean here?
-
-A) Resizable — user can drag an edge/corner to make the panel bigger or smaller
-
-B) Just "large and roomy" compared to the small list card — not literally draggable/resizable by the user, just a bigger fixed layout
-
-C) Resizable AND repositionable (drag to move it, not just resize)
-
-D) Other (please describe after [Answer]: tag below)
+### Q3: Should cloud storage fully replace localStorage, or run alongside it?
+A) Full replacement — `storage.js` calls the cloud backend directly, no local fallback
+B) Hybrid — keep localStorage for offline use, sync to cloud when online
+C) Not sure — want a recommendation based on tradeoffs
 
 [Answer]: A
 
-## Question 4
-What should "write in it" mean for this first version?
+---
 
-A) Plain text — a big `<textarea>` for the summary, same as today's data model, just a bigger/nicer input surface
-
-B) Rich text / Markdown editing — pulls forward some of the Phase 5 "Markdown editing" work described in CLAUDE.md's roadmap
-
-C) Other (please describe after [Answer]: tag below)
-
-[Answer]: A
-
-## Question 5
-Which fields should be visible/editable inside the expanded panel?
-
-A) Just the summary (the "writing" part) — title/date/tags stay list-card-only for now
-
-B) Everything — title, date, inGameDate, summary, and tags, all editable in the panel
-
-C) Other (please describe after [Answer]: tag below)
+### Q4: Does this require user accounts / authentication?
+A) Yes — single user (just you), simple login to gate access to your own data
+B) Yes — multi-user (you + players/DM could each have their own account/campaign access)
+C) No auth — data is cloud-hosted but not access-gated
+D) Other (describe)
 
 [Answer]: B
 
-## Question 6
-How should edits made in the panel get saved?
+---
 
-A) Auto-save as you type (e.g. debounced save to localStorage), no explicit save button
-
-B) Explicit "Save" button/action — edits aren't committed until you click it
-
-C) Other (please describe after [Answer]: tag below)
+### Q5: Where should the backend migration sit relative to the remaining feature phases (Character Tracker, World-Building, Polish)?
+A) Do the backend/cloud migration first, then build Phases 3-5 on top of it
+B) Finish Phases 3-5 on localStorage first, then migrate everything to the cloud in one pass at the end
+C) Treat it as its own track — describe your preferred placement
 
 [Answer]: A
 
-## Question 7
-How does the panel close, and can more than one be open at once?
+---
 
-A) Only one session panel open at a time; opening another auto-closes the current one; closes via an X button or clicking outside it
+## Follow-Up Questions (Round 2)
 
-B) Only one at a time, closes via X button only (no click-outside-to-close)
+Your answers to Q4 (multi-user) and Q3 (full replacement, no local fallback) open two new gaps below.
 
-C) Other (please describe after [Answer]: tag below)
+### Q6: With multi-user accounts, what should DM vs. player permissions look like?
+A) DM (campaign owner) has full edit rights; invited players get view-only access to sessions/characters/world
+B) DM has full edit rights; invited players can also edit (fully collaborative notes)
+C) Everyone with an account creates their own campaigns; sharing/access is per-campaign, explicit invite only, with the inviter choosing view or edit per invite
+D) Other (describe)
 
-[Answer]: If you attempt to open another panel it opens it up but as like a new tab that you can swap from either session. You should then also be allowed to drag it out to have it show alongside the other session
+[Answer]: A
 
-## Question 8
-The current decision log says entering edit mode reveals a delete button on the card. With the new panel-based approach, where should deleting a session live?
+---
 
-A) Delete button inside the open side panel
-
-B) Delete button stays on the list card itself (visible on hover or double-click state), separate from the panel
-
-C) Both — available in both places
-
-D) Other (please describe after [Answer]: tag below)
+### Q7: Full replacement means no localStorage fallback — is offline access needed (e.g., at the table without wifi)?
+A) No — always-online is fine
+B) Yes — need some offline capability (would require a hybrid/service-worker approach layered on later)
+C) Not a priority now — revisit if it becomes a real problem in practice
 
 [Answer]: B
+
+---

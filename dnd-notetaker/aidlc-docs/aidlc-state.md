@@ -37,20 +37,22 @@
 - **Infrastructure scope note**: No AWS/cloud infrastructure exists (GitHub Pages hosting + localStorage). Infrastructure Design and cloud-specific NFR Design content will generally resolve to N/A/skip until a backend migration is underway — don't force AWS-flavored artifacts onto a static site.
 
 ## Active Feature Request
-- **Request**: Sessions page — session detail card. Clicking a campaign shows sessions as list cards; double-clicking a session should open a "reconfigurable" side panel (OneNote-style) taking up a chunk of the screen, with the ability to write in it.
-- **Request Type**: Enhancement (to the in-progress Phase 2 Session Notes / Campaigns feature)
-- **Scope Estimate**: Multiple components (`sessions.html`, `sessions.js`, `css/style.css`; possibly `storage.js` if data shape changes)
-- **Complexity Estimate**: Complex (escalated from initial Moderate — resolved answers describe a tab-management + drag-to-split panel system, not just a single resizable drawer)
-- **Status**: Requirements approved-pending (doc generated, awaiting user approval); recommending User Stories stage run next given interaction complexity
+- **Request**: Project roadmap / scaffold plan, amended to full stack — Supabase (Postgres + Auth) replacing localStorage, RLS-enforced DM/player permissions, in-app revision history, new Phase 0 (Backend Migration) inserted before Character Tracker/World-Building.
+- **Request Type**: New Project-level planning (system-wide) + architecture pivot (reverses prior "localStorage-first" decision in CLAUDE.md)
+- **Scope Estimate**: System-wide
+- **Complexity Estimate**: Complex (real backend, auth, multi-user permissions, data migration)
+- **Status**: Requirements Analysis complete (Standard depth, both clarifying-question rounds answered, `aidlc-docs/inception/requirements/project-roadmap-requirements.md`) — awaiting user approval. Open flag (not yet decided): whether to re-enable the Security Baseline extension now that real auth/multi-user data are in scope. User Stories recommended for inclusion now (multi-user DM/player permission flows benefit from stories); Application Design recommended once Phase 0 is picked up (new Supabase schema/components). Next: Workflow Planning to produce the sequenced roadmap.
 
-## Stage Progress
+### Previous Feature Request (COMPLETE)
+- Sessions page — Session Detail Panel (OneNote-style tabs, split view, autosave). Fully delivered through Build and Test, approved 2026-08-17.
+
+## Stage Progress (Previous Feature — session-detail-panel — COMPLETE, archived)
 ### 🔵 INCEPTION PHASE
 - [x] Workspace Detection (baseline)
 - [ ] Reverse Engineering (deferred, see above)
-- [x] Requirements Analysis (`aidlc-docs/inception/requirements/requirements.md`) — pending user approval
+- [x] Requirements Analysis (`aidlc-docs/inception/requirements/requirements.md`) — approved
 - [x] User Stories (`stories.md`, `personas.md`) — approved (with delete-confirmation revisions)
 - [x] Workflow Planning (`execution-plan.md`) — approved
-- [ ] Workflow Planning
 - [x] Application Design (`application-design/`) — approved
 - [x] Units Generation — SKIPPED (single small app, no multi-service decomposition; using implicit unit `session-detail-panel`)
 
@@ -62,8 +64,15 @@
 
 ### 🟡 OPERATIONS PHASE
 - [x] Operations — PLACEHOLDER, N/A (no deployment/monitoring scope yet; GitHub Pages hosting is manual)
-- [ ] NFR Requirements — SKIP (NFRs already fully captured in requirements.md)
-- [ ] NFR Design — SKIP
-- [ ] Infrastructure Design — SKIP (no cloud infra)
-- [ ] Code Generation — EXECUTE (ALWAYS)
-- [ ] Build and Test — EXECUTE (ALWAYS)
+
+## Stage Progress (Current Request — Project Roadmap)
+### 🔵 INCEPTION PHASE
+- [x] Workspace Detection (resumed from existing state)
+- [ ] Reverse Engineering — SKIPPED (existing CLAUDE.md docs current, no gaps for this request)
+- [x] Requirements Analysis (`aidlc-docs/inception/requirements/project-roadmap-requirements.md`, Minimal depth) — pending user approval
+- [x] User Stories (`aidlc-docs/inception/user-stories/personas.md`, `stories.md`) — approved (revised 4x: personal notes added, revocation semantics, per-page opt-in visibility)
+- [x] Workflow Planning (`aidlc-docs/inception/plans/execution-plan.md`) — generated, pending user approval. Roadmap: Phase 0a-e (Supabase/auth/storage migration/revisions/personal-notes+visibility/data migration) → Phase 3 (Characters) → Phase 4 (World) → Phase 5 (Polish).
+- [ ] Application Design — recommended EXECUTE next (new Supabase schema/RLS/auth components need identification)
+- [ ] Units Generation — recommended EXECUTE (formalizes the 8-unit roadmap table into unit-of-work artifacts)
+- [ ] Application Design — SKIPPED for now (no new components being architected until a phase is picked to build)
+- [ ] Units Generation — deferred until a specific phase is chosen to implement

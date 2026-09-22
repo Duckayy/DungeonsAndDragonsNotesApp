@@ -236,3 +236,119 @@
 **Context**: CONSTRUCTION - Build and Test → OPERATIONS (placeholder, no action) — workflow complete.
 
 ---
+
+## New Request — Project Roadmap / Scaffold Planning
+**Timestamp**: 2026-09-20T17:19:16Z
+**User Input**: "Can you help create a plan to scaffold the app, tech stack, features etc"
+**AI Response**: Treated as a new INCEPTION-phase request scoped to the whole project (not a single feature): consolidate tech stack decisions and produce a sequenced roadmap for remaining phases (Characters, World-Building, Polish, backend migration). Workspace Detection resumed from existing aidlc-state.md (brownfield, prior feature complete). Running Requirements Analysis at Minimal depth — tech stack and feature list are already fully decided and documented in CLAUDE.md, so this is consolidation/sequencing rather than new discovery; skipping the clarifying-questions file since no material ambiguity exists, per requirements-analysis.md Step 6 exception ("unless requirements are exceptionally clear and complete"). Will skip User Stories and Application Design (no new components/architecture being decided) and proceed Requirements Analysis -> Workflow Planning (roadmap) as the primary deliverable.
+**Context**: INCEPTION - Requirements Analysis (new project-wide roadmap request), Minimal depth.
+
+---
+
+## Requirements Analysis Complete — Awaiting Approval
+**Timestamp**: 2026-09-20T17:19:16Z
+**AI Response**: Generated `aidlc-docs/inception/requirements/project-roadmap-requirements.md`. Presenting completion message with approval gate (Request Changes / Approve & Continue to Workflow Planning). User Stories and Application Design recommended skip for this request.
+**Context**: INCEPTION - Requirements Analysis, Step 9 — gate awaiting user approval.
+
+---
+
+## Scope Change — Full Stack Pivot Requested
+**Timestamp**: 2026-09-20T17:30:00Z
+**User Input**: "include the tech stack for cloud note storage as well as version control. make this full stack"
+**AI Response**: This reverses the "MVP-first, localStorage -> backend later" decision logged in CLAUDE.md. Per CLAUDE.md's collaboration rule (don't decide architecture/naming unilaterally), created `aidlc-docs/inception/requirements/requirement-verification-questions.md` asking: (Q1) what "version control" means here (git vs in-app note history vs both), (Q2) target cloud backend (Supabase/Firebase/custom), (Q3) full replacement vs hybrid local+cloud, (Q4) auth requirements (single-user/multi-user/none), (Q5) where this migration sits relative to Phases 3-5. Gate: awaiting answers before regenerating requirements.md.
+**Context**: INCEPTION - Requirements Analysis, Step 6 — new clarifying-questions gate opened due to scope change.
+
+---
+
+## Full Stack Pivot — Answers Received
+**Timestamp**: 2026-09-21T00:00:00Z
+**User Input**: "Done" (answers filled into requirement-verification-questions.md: Q1=B in-app revision history, Q2=A Supabase, Q3=A full replacement of localStorage, Q4=B multi-user with player/DM accounts, Q5=A migrate backend first, before Phases 3-5)
+**AI Response**: Analyzed answers for ambiguity per Step 6 mandatory follow-up rule. Two gaps identified: (1) Q4=multi-user leaves permissions/roles (DM vs player edit rights) undefined — a real data-model/API decision; (2) Q3=full replacement + no localStorage fallback raises an offline-at-the-table question that wasn't asked. Added Q6 (permissions model) and Q7 (offline needs) to the same questions file rather than opening a new one. Gate remains open pending these two answers.
+**Context**: INCEPTION - Requirements Analysis, Step 6 — follow-up questions round.
+
+---
+
+## Full Stack Pivot — Round 2 Answers Received, Requirements Finalized
+**Timestamp**: 2026-09-21T00:10:00Z
+**User Input**: "done" (Q6=A DM full edit / players view-only via RLS; Q7=B offline capability wanted but explicitly "layered on later" — reconciled as: Phase 0 ships cloud-only, offline/PWA is a deferred future enhancement, not a blocker or contradiction of Q3's full-replacement answer)
+**AI Response**: Rewrote `aidlc-docs/inception/requirements/project-roadmap-requirements.md` in full to incorporate the full-stack pivot: Supabase (Postgres+Auth), RLS-enforced DM/player permissions, in-app revision history (not git), full replacement of localStorage, new Phase 0 (Backend Migration) inserted before Phase 3, and offline/realtime explicitly deferred. Also flagged (not auto-changed) that Security Baseline extension (currently "No" in aidlc-state.md) should likely be reconsidered now that real auth + multi-user data are in scope — left for Ashton's explicit confirmation. Presenting Requirements Analysis completion message, gated on approval before Workflow Planning.
+**Context**: INCEPTION - Requirements Analysis, Step 7-9 — requirements finalized, gate awaiting approval.
+
+---
+
+## Requirements Analysis — Approved
+**Timestamp**: 2026-09-22T00:00:00Z
+**User Input**: "Continue"
+**AI Response**: Requirements Analysis approved for the full-stack roadmap request. Proceeding to User Stories stage (recommended given new DM/player permission flows), Part 1 - Planning.
+**Context**: INCEPTION - Requirements Analysis → User Stories transition.
+
+---
+
+## User Stories — Part 1 Planning Presented
+**Timestamp**: 2026-09-22T00:05:00Z
+**AI Response**: Created `aidlc-docs/inception/plans/user-stories-assessment.md` (decision: execute, DM/player is a genuinely new multi-persona distinction) and `aidlc-docs/inception/plans/story-generation-plan.md` (persona-based breakdown, scoped to Phase 0 only — Phases 3-5 deferred to their own future story rounds). Plan embeds 4 clarifying questions: acceptance criteria format, campaign visibility to players, access-revocation scope, and revision-restore semantics (new-revision-on-top vs. overwrite). Presenting plan for approval, gated before generation.
+**Context**: INCEPTION - User Stories, Part 1 Planning, Steps 2-13 — gate awaiting approval.
+
+---
+
+## User Stories Plan — Approved
+**Timestamp**: 2026-09-22T00:15:00Z
+**User Input**: "Done" (Q1=A Given/When/Then, Q2=A invite-only visibility, Q3=B DM can revoke player access — in scope for Phase 0, Q4=A restore is non-destructive/creates new revision on top)
+**AI Response**: No ambiguity found in answers; added a "Revoking a player's access" story to the execution checklist per Q3. Plan approved. Proceeding to Part 2 - Generation: personas.md and stories.md.
+**Context**: INCEPTION - User Stories, Part 1 → Part 2 transition.
+
+---
+
+## User Stories — Part 2 Generation Complete
+**Timestamp**: 2026-09-22T00:20:00Z
+**AI Response**: Generated `aidlc-docs/inception/user-stories/personas.md` (Ashton/DM, Player) and `stories.md` (11 stories: auth, campaign creation, invite, accept-invite, read-only view, edit-blocked defense-in-depth via RLS, revoke access, DM edit, view revision history, restore revision, one-time localStorage migration), all with Given/When/Then acceptance criteria per Q1, persona-mapped in a table. Two implementation-detail open items flagged for Phase 0 Functional Design (invite-to-unregistered-email mechanics; migration idempotency) — explicitly not blocking at this stage. All story-generation-plan.md checklist items marked [x]. Presenting completion message, gated on approval before Workflow Planning.
+**Context**: INCEPTION - User Stories, Part 2 Generation, Steps 15-20 — gate awaiting approval.
+
+---
+
+## User Stories — Requested Changes: Player-Owned Notes + Fully-Fledged Scope
+**Timestamp**: 2026-09-22T00:30:00Z
+**User Input**: "DM should own and keep all session notes however players should be able to manage their own notes as in read and write. as for technical context treat me as if I intend to make this a fully fledged app so do not hold back on features" (followed mid-turn by: "unless this is just for phase 0" — read as: don't block story approval on the DM-visibility-into-player-notes detail if it's a Phase 0-only concern)
+**AI Response**: Revised permission model: two distinct scopes instead of one campaign-wide read/write toggle — DM keeps full ownership/edit of DM-authored session notes (players stay view-only there), while each player separately gets full read/write on their own personal notes, isolated from the DM and from other players. Updated `personas.md` and `stories.md` (added Story 12 "create/edit/delete own personal notes" and Story 13 "personal notes isolated from DM's notes, defense in depth"; revised Stories 5 and 6 wording to specify "DM's notes" rather than blanket "campaign contents"). Treated "whether DM can read a player's personal notes" as a non-blocking open item deferred to Phase 0 Functional Design, matching how the two existing open items (invite mechanics, migration idempotency) are already handled — consistent with the user's follow-up. Logged the "fully fledged app, don't hold back" directive in `project-roadmap-requirements.md` as a scope-breadth instruction for the upcoming Workflow Planning stage (revisit realtime/offline/Security Baseline/Resiliency Baseline as real roadmap items) — not treated as blanket authorization to add unrelated architecture unilaterally. Re-presenting completion message for approval.
+**Context**: INCEPTION - User Stories, Part 2 Generation — revision applied, gate re-opened for approval.
+
+---
+
+## User Stories — Requested Changes: Revocation Becomes Frozen Read-Only, Not Full Cutoff
+**Timestamp**: 2026-09-22T00:35:00Z
+**User Input**: "When access is revoked the player can still view notes however they no longer can see or manage updated versions."
+**AI Response**: Rewrote Story 7 acceptance criteria: revocation no longer removes campaign visibility entirely — instead the player keeps read-only access to the DM's notes frozen at the moment of revocation, doesn't see any DM edits/additions made after that point, and loses write ("manage") access, including to their own personal notes (they can still read their own past personal notes, just can't add/change them post-revocation). Added an open item noting the frozen-snapshot mechanism likely reuses the Story 9/10 revision-history schema rather than needing a separate mechanism — deferred to Phase 0 Functional Design, not blocking here. Re-presenting for approval.
+**Context**: INCEPTION - User Stories, Part 2 Generation — second revision applied, gate re-opened for approval.
+
+---
+
+## User Stories — Reverted: Revocation Is Full Cutoff, Not Frozen View
+**Timestamp**: 2026-09-22T00:40:00Z
+**User Input**: "Actually they just have no access whatsoever to the notes if they get revoked"
+**AI Response**: Reverted Story 7 to the original full-cutoff behavior (superseding the prior "frozen read-only" revision): revocation immediately removes all read and write access — to DM notes and to the player's own personal notes — and the campaign disappears from their list entirely. Removed the now-inapplicable "frozen snapshot reuses revision history" open item. Re-presenting for approval.
+**Context**: INCEPTION - User Stories, Part 2 Generation — third revision (revert), gate re-opened for approval.
+
+---
+
+## User Stories — Requested Changes: Per-Page Visibility Toggle (Opt-In, Not Blanket View)
+**Timestamp**: 2026-09-22T00:45:00Z
+**User Input**: "Player's should not be able to see DM notes unless dm sets that specific page to be visible and available to players. I.e DM wants map to be available to players as well as character images however players shouldnt be able to see the page that has notes that may be story critical"
+**AI Response**: Replaced "players see all DM notes read-only" with a per-note/page opt-in visibility model: hidden is the default for any DM-authored session/character/world entry; the DM explicitly marks individual pages (e.g., a map, a character portrait) visible to share them, while unmarked pages (story-critical notes) stay completely invisible to players — not just non-editable, not listed/searchable/linkable either. Renumbered/revised Story 5 (now: DM marks a page visible), Story 6 (now: player views only marked-visible pages), and Story 6b (defense-in-depth: RLS returns nothing for unmarked pages, not just a UI hide). Updated personas.md and the requirements doc's permissions decision to match. Added an open item: Phase 0 only needs a simple visible/hidden boolean per page; per-specific-player visibility is a possible future enhancement, not required now. Re-presenting for approval.
+**Context**: INCEPTION - User Stories, Part 2 Generation — fourth revision, gate re-opened for approval.
+
+---
+
+## User Stories — Approved
+**Timestamp**: 2026-09-22T00:50:00Z
+**User Input**: "continue"
+**AI Response**: User Stories stage approved (personas.md, stories.md — 13 stories covering auth, campaign/invite, per-page visibility opt-in, revoke-as-full-cutoff, personal notes, revision history). Proceeding to Workflow Planning to produce the sequenced roadmap.
+**Context**: INCEPTION - User Stories → Workflow Planning transition.
+
+---
+
+## Workflow Planning Complete
+**Timestamp**: 2026-09-22T01:00:00Z
+**AI Response**: Generated `aidlc-docs/inception/plans/execution-plan.md`: risk assessed High (real auth/RLS security enforcement + one-time data migration of Ashton's live campaign data). Sequenced an 8-unit roadmap: Phase 0a (Supabase setup & auth) -> 0b (storage.js migration to Supabase + RLS) -> 0c (revision history) -> 0d (player personal notes + DM visibility-toggle UI) -> 0e (one-time localStorage data migration) -> Phase 3 (Characters) -> Phase 4 (World-Building) -> Phase 5 (Polish). Recommending Application Design and Units Generation both EXECUTE next (new components need identification; roadmap should be formalized into unit-of-work artifacts) before any Construction-phase work begins on a specific unit. Presenting plan for approval.
+**Context**: INCEPTION - Workflow Planning, Steps 1-9 — gate awaiting approval.
+
+---

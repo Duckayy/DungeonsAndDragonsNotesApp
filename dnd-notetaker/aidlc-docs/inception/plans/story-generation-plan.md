@@ -1,59 +1,62 @@
-# Story Generation Plan — Sessions Page: Session Detail Panel
+# Story Generation Plan — Full Stack Pivot (Phase 0 focus)
 
-**Role**: Product owner, converting `requirements.md`'s 10 functional requirements into testable user stories.
+## Scope
+Stories cover **Phase 0 (Backend Migration)** only — the new DM/player accounts, permissions, and
+revision history. Phases 3/4/5 (Characters, World-Building, Polish) keep their existing informal
+scope from CLAUDE.md and will get their own stories later, per-unit, when picked up — writing detailed
+stories for unbuilt, unscoped features now would be speculative.
+
+## Personas (draft, to confirm via questions below)
+- **Ashton (DM / Campaign Owner)** — creates campaigns, writes/edits all notes, invites players
+- **Player** — invited to a specific campaign, can view sessions/characters/world for that campaign, cannot edit
+
+## Story Breakdown Approach
+**Persona-Based**, grouped by DM stories vs. Player stories, since the entire point of this stage is
+nailing down the boundary between those two roles. (Feature-based was considered but would scatter
+the DM/player permission boundary across unrelated feature groups.)
 
 ## Execution Checklist
-- [x] Confirm persona(s) (Question 1) — A: single "Player" persona
-- [x] Confirm story granularity (Question 2) — B: grouped by feature area
-- [x] Confirm breakdown approach (Question 3) — B: feature-based
-- [x] Confirm acceptance criteria format (Question 4) — B: checklist bullets
-- [x] Generate `aidlc-docs/inception/user-stories/personas.md`
-- [x] Generate `aidlc-docs/inception/user-stories/stories.md` (INVEST-compliant, with acceptance criteria, mapped to persona(s))
+- [x] Generate `aidlc-docs/inception/user-stories/personas.md` (DM, Player)
+- [x] Generate `aidlc-docs/inception/user-stories/stories.md` covering:
+  - [x] Account creation / login (DM and Player)
+  - [x] Campaign creation and ownership (DM)
+  - [x] Inviting a player to a campaign (DM)
+  - [x] Accepting an invite / accessing a shared campaign (Player)
+  - [x] Viewing sessions/characters/world in a shared campaign, read-only (Player)
+  - [x] Attempting to edit as a Player is blocked, both in UI and at the database level (Player + DM, negative case)
+  - [x] Revoking a player's access to a campaign (DM) — added per Q3 answer, in scope for Phase 0
+  - [x] Editing sessions/characters/world (DM)
+  - [x] Viewing revision history for a note (DM)
+  - [x] Restoring a previous revision (DM)
+  - [x] One-time migration of existing localStorage campaign/session data into Supabase (Ashton, one-off)
+- [x] Each story follows INVEST criteria, with acceptance criteria as a Given/When/Then list
+- [x] Map each story to its persona(s) in a table at the top of stories.md
 
 ## Clarifying Questions
 
-### Question 1 — Personas
-This app is "player-facing first" (per CLAUDE.md); DM features are on the roadmap but not built. Should stories model one persona or plan ahead for two?
-
-A) Single persona only — "Player" (the campaign note-taker using the app solo). Matches current app scope exactly.
-
-B) Two personas now — "Player" and a placeholder "DM" persona, even though DM-specific features don't exist yet, so future DM-facing stories have a home to attach to.
-
-C) Other (please describe after [Answer]: tag below)
+### Q1: Acceptance criteria format
+A) Given/When/Then (Gherkin-style) — more formal, reads like a test spec
+B) Simple checklist bullets ("Player can view X", "Player cannot edit Y") — faster to read, less formal
+C) Other (describe)
 
 [Answer]: A
 
-### Question 2 — Story Granularity
-How granular should the stories be?
+### Q2: Can players see *which* campaigns they're in, or only campaigns they're explicitly invited to?
+A) Only campaigns they've been explicitly invited to (no discovery/browsing of other campaigns)
+B) Other (describe)
 
-A) One story per functional requirement — roughly 10 small stories mirroring FR1–FR10 in requirements.md directly.
+[Answer]: A
 
-B) Grouped into a handful of larger stories by feature area — e.g. "Open and edit a session in the panel," "Delete a session," "Manage multiple open sessions via tabs," "View two sessions side-by-side."
-
-C) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
-
-### Question 3 — Breakdown Approach
-Which organizing approach fits best? (Persona-Based doesn't really apply if Question 1 = single persona.)
-
-A) User Journey-Based — stories follow the flow: browse list → open panel → edit → open another (tabs) → split view → close/delete.
-
-B) Feature-Based — stories grouped by capability area (panel basics, editing/autosave, tab management, split view, delete).
-
-C) Epic-Based — one "Session Detail Panel" epic containing all sub-stories, useful if you want a single top-level tracking item.
-
-D) Other (please describe after [Answer]: tag below)
+### Q3: When a player is removed from a campaign (or an invite is revoked), what should happen?
+A) Out of scope for Phase 0 — revoking access isn't needed yet, add later if it comes up
+B) Must be in scope now — DM can revoke a player's access to a campaign
+C) Other (describe)
 
 [Answer]: B
 
-### Question 4 — Acceptance Criteria Format
-How should acceptance criteria be written per story?
+### Q4: Should the "restore a previous revision" story overwrite the current note, or create a new revision on top (so nothing is ever truly lost)?
+A) Restoring creates a new revision on top of history (non-destructive, preferred default for a note-history feature)
+B) Restoring overwrites the current version directly (simpler, but the pre-restore version could be lost if not itself in history)
+C) Other (describe)
 
-A) Given/When/Then format (e.g. "Given a session is open in the panel, When I edit the summary, Then the change is saved within 1 second without a Save button").
-
-B) Simple checklist bullets per story (e.g. "- Auto-saves on edit", "- No Save button present").
-
-C) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
+[Answer]: A
