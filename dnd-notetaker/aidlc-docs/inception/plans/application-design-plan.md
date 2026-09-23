@@ -1,49 +1,44 @@
-# Application Design Plan — Sessions Page: Session Detail Panel
+# Application Design Plan — Full Stack Pivot
 
-## Execution Checklist
-- [x] Confirm component file organization (Question 1) — A: new `js/sessionPanel.js`
-- [x] Confirm component code style / interface pattern (Question 2) — B: `SessionPanel` namespace object
-- [x] Confirm panel/tab/split state location (Question 3) — B: reflected in URL query params (`requirements.md` NFR3 updated accordingly)
-- [x] Generate `aidlc-docs/inception/application-design/components.md`
-- [x] Generate `aidlc-docs/inception/application-design/component-methods.md`
-- [x] Generate `aidlc-docs/inception/application-design/services.md`
-- [x] Generate `aidlc-docs/inception/application-design/component-dependency.md`
-- [x] Generate `aidlc-docs/inception/application-design/application-design.md` (consolidated)
+## Scope
+High-level component identification for the Phase 0 backend migration (Supabase, auth, RLS,
+revisions, personal notes, visibility toggle) — the pieces that will exist across all future units,
+not per-unit business logic (that's Functional Design, later, per unit).
 
-## Note on Q3 Follow-through
-Q3 confirmed URL-based persistence but didn't specify exactly which sub-state is URL-encoded. To avoid over-scoping, the design below makes an explicit assumption: `open` (which sessions have tabs) and `split` (which two are shown side-by-side) go in the URL; panel resize width stays in-memory/ephemeral (not shareable-meaningful). Flagged in `application-design.md` under Open Decisions for correction if wrong.
+## Plan Checklist
+- [x] Generate `components.md` — new/changed components and their responsibilities
+- [x] Generate `component-methods.md` — method signatures for `storage.js`'s (unchanged) public API plus any new modules
+- [x] Generate `services.md` — how components orchestrate (e.g., who calls Supabase directly vs. through `storage.js`)
+- [x] Generate `component-dependency.md` — dependency matrix + data flow
+- [x] Generate `application-design.md` — consolidated summary of the above
 
 ## Clarifying Questions
 
-### Question 1 — Component File Organization
-This project has no bundler/build step — every JS file is a plain `<script>` tag sharing global scope (`app.js`, `storage.js`, `sessions.js`, etc., per CLAUDE.md's file structure). The new panel/tab/split subsystem is a meaningfully-sized new piece of logic. Where should it live?
+### Q1: Should `storage.js` stay one file handling everything, or split by domain as scope grows?
+Today `storage.js` is one small file with `saveItem`/`loadItem`/`deleteItem`/`listItems`. Phase 0 adds
+auth, campaign membership, revisions, personal notes, and visibility — a lot more surface area.
+A) Keep `storage.js` as the single public API (same 4 functions), with a new internal `supabaseClient.js` just for SDK setup — everything else stays as-is from the callers' perspective
+B) Split into per-domain files now (e.g., `sessionsStore.js`, `campaignsStore.js`, `revisionsStore.js`) that `storage.js` re-exports from
+C) Other (describe)
 
-A) New file `js/sessionPanel.js`, loaded via its own `<script>` tag only on `sessions.html` (alongside `sessions.js`) — keeps the new subsystem visually and physically separate from the existing list-rendering code
+[Answer]:A
 
-B) Added directly into the existing `js/sessions.js` — keeps everything for this page in one file
+### Q2: Where should login/auth state live?
+A) New `auth.js` module — exposes `getCurrentUser()`, `login()`, `logout()`, `onAuthChange()`; pages import it directly when they need to check who's logged in
+B) Folded into `app.js` (currently the dashboard-only router/shared logic file)
+C) Other (describe)
 
-C) Other (please describe after [Answer]: tag below)
+[Answer]:A
+
+### Q3: Should the new UI pieces (DM visibility toggle, revision history viewer, invite management) be their own component files, or built into the existing `sessionPanel.js`?
+A) Separate files (e.g., `visibilityToggle.js`, `revisionHistory.js`, `campaignInvites.js`) that `sessionPanel.js` and future `characters.js`/`world.js` all import and reuse
+B) Built directly into `sessionPanel.js` since that's the only place they're needed right now, split out later if `characters.js`/`world.js` need the same UI
+C) Other (describe)
 
 [Answer]: A
 
-### Question 2 — Component Code Style
-Given there's no module system, how should the new component(s) be structured to avoid dumping a pile of loose global functions and variables into the shared scope?
+### Q4: Should RLS policies be treated as their own tracked "component" (with a components.md entry, documented per table), or just noted inline wherever a table is described?
+A) Own dedicated section/component — RLS is the entire enforcement mechanism for the DM/player permission model, worth documenting explicitly and reviewing on its own
+B) Inline notes per table are enough
 
-A) Plain global functions + a few page-scoped variables — matches the app's current style everywhere else exactly (e.g. `renderSessions()`, module-level `let` variables), simplest and most consistent with the rest of the codebase
-
-B) A single object/namespace (e.g. `const SessionPanel = { state: {...}, open(id), closeTab(id), switchTab(id), detachToSplit(id), resize(width), ... }`) so the panel's internal state and methods are grouped together instead of loose in global scope — still no build tooling required, just a JS object literal
-
-C) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
-
-### Question 3 — Panel/Tab/Split State Location
-Where should "which sessions are open, which tab is active, split-view state" actually live while the page is open?
-
-A) In-memory JS only (a plain object/variable) — refreshing the page closes all panels and resets to the list view. Matches NFR3 in requirements.md (UI state doesn't need to persist across reload).
-
-B) Reflected in the URL's query params (similar to the existing `?campaign=camp_123` pattern) so a refresh preserves which session(s) are open
-
-C) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
+[Answer]: A

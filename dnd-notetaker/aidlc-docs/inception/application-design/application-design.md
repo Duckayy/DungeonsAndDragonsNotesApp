@@ -1,27 +1,22 @@
-# Application Design — Sessions Page: Session Detail Panel
+# Application Design — Full Stack Pivot (Phase 0) — Consolidated
 
-**Consolidates**: components.md, component-methods.md, services.md, component-dependency.md
+See individual docs for full detail: `components.md`, `component-methods.md`, `services.md`, `component-dependency.md`.
 
 ## Summary
-Two components: `SessionListRenderer` (extends existing `sessions.js`) and a new `SessionPanel` namespace object in a new `js/sessionPanel.js` file. No new orchestration/service layer — both call `storage.js` directly and coordinate with each other via direct function calls, matching the app's existing no-framework, no-build-step architecture.
+Three new leaf/mid-layer modules (`supabaseClient.js`, `auth.js`, and `storage.js`'s internals) replace the
+localStorage backend without changing `storage.js`'s public API. Three new reusable UI components
+(`visibilityToggle.js`, `revisionHistory.js`, `campaignInvites.js`) implement the DM/player permission
+UX and are designed to be reused unchanged by the not-yet-built `characters.js`/`world.js` in Phase 3/4.
+Row Level Security policies in Supabase — not any JS file — are the actual permission enforcement and
+are documented as their own component per Ashton's Q4 answer.
 
-## Components
-See [components.md](components.md) for full detail.
-- **SessionListRenderer** (`js/sessions.js`, extended): session list, hover-delete + inline confirm, hands off double-click to `SessionPanel.open()`
-- **SessionPanel** (`js/sessionPanel.js`, new): panel/tab/split subsystem, field editing, autosave, URL state sync
+## Design Decisions (from application-design-plan.md answers)
+1. `storage.js` stays the single public data API (4 unchanged functions); a new `supabaseClient.js` owns SDK setup internally.
+2. Auth state lives in a new `auth.js` module, not folded into `app.js`.
+3. New UI pieces (visibility toggle, revision history, invites) are separate reusable component files, not built directly into `sessionPanel.js`.
+4. RLS policies are documented as their own dedicated component, not just inline notes — they're the real security boundary for the whole DM/player model in `stories.md`.
 
-## Component Methods
-See [component-methods.md](component-methods.md) for full signatures.
-
-## Services
-See [services.md](services.md). No new service layer — `storage.js` used directly by both components.
-
-## Component Dependencies
-See [component-dependency.md](component-dependency.md). Load order: `storage.js → sessions.js → sessionPanel.js`.
-
-## Open Decisions / Assumptions to Verify
-1. **URL param scope** (from plan Question 3 follow-through): `open` (comma-separated open session IDs) and `split` (which two are side-by-side) are URL-persisted; resize width is not. Flag if this split is wrong.
-2. **Delete-while-open edge case**: What happens if a session is deleted from the list while its panel tab is currently open? Not yet defined — needs an explicit rule in Functional Design (e.g. auto-close that tab, or block delete while open, or show a "this session was deleted" state in the panel).
-3. **Autosave-then-delete race**: If a debounced save is pending when a delete happens elsewhere, is there a conflict? Likely resolved naturally by delete removing the storage key, but worth Functional Design confirming the save doesn't recreate a deleted session.
-
-These three feed directly into Functional Design as its starting point.
+## Scope Boundary
+This is component identification only — method-level business rules, exact Postgres schema/column
+types, and RLS policy SQL are Functional Design work, done per-unit (starting with Phase 0a) when
+that unit is picked up for Construction.

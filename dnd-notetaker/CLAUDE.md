@@ -7,10 +7,11 @@ portfolio piece for the STEM Advantage General Scholars program (CS/Software Eng
 track) — so clean, complete phases matter as much as functionality.
 
 ## Stack
-Vanilla HTML / CSS / JS. Storage: localStorage via a `storage.js` abstraction layer
-(deliberately chosen so swapping to Supabase/Firebase later is a clean migration, not a
-rewrite). Multi-page app pattern — each HTML page is its own screen. Hosting: GitHub Pages
-(planned). No frameworks yet.
+Vanilla HTML / CSS / JS, no frameworks. Storage: currently localStorage via a `storage.js`
+abstraction layer; **migration to Supabase (Postgres + Auth) is approved and in progress**
+(see Decisions below) — `storage.js`'s public API is being kept stable specifically so this
+swap doesn't require rewriting callers. Multi-page app pattern — each HTML page is its own
+screen. Hosting: migrating from GitHub Pages to Netlify or Cloudflare Pages (see Decisions).
 
 ## File structure
 ```
@@ -153,6 +154,23 @@ no ceremony. Check here before re-deciding something already settled.
   Cancel"), never a popup/`window.confirm()` — applies to the session list; the "+
   Create New Session" draft flow's old `.edit-fields`-based Save/Cancel/Delete pattern
   is untouched and still shared with campaign/character cards.
+- Full-stack pivot approved (2026-09-22): backend moves from localStorage to Supabase
+  (Postgres + Auth), with multi-user accounts (DM full edit, invited players view-only
+  per explicitly-opted-in page — hidden by default), plus each player's own personal
+  notes (full read/write, isolated from DM notes and other players), in-app revision
+  history (not git), and full replacement of localStorage (no offline fallback for now).
+  Sequenced as a new Phase 0 (5 sub-units) before Character Tracker/World-Building. See
+  `aidlc-docs/inception/requirements/project-roadmap-requirements.md` and
+  `aidlc-docs/inception/plans/execution-plan.md` for full detail.
+- **Hosting changed from GitHub Pages to Netlify or Cloudflare Pages** (decided during
+  Unit 0a NFR Requirements, 2026-09-22): GitHub Pages cannot set the custom HTTP response
+  headers (CSP, HSTS, X-Frame-Options, etc.) required once the Security Baseline
+  extension was enabled for the full-stack pivot. Both alternatives are free and deploy
+  directly from this GitHub repo, so no other tooling changes.
+- Security Baseline extension enabled starting with Unit 0a (was off; the earlier "no
+  auth/cloud infra yet" rationale no longer applies once Supabase Auth exists). See
+  `aidlc-docs/aidlc-state.md` Extension Configuration and
+  `aidlc-docs/construction/0a-supabase-auth/nfr-requirements/` for compliance detail.
 
 ## Bugs already hit and resolved (don't reintroduce)
 - `window.onload` conflict between `app.js` and `sessions.js` — each page should only

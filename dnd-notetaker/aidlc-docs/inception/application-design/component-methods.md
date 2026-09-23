@@ -1,27 +1,33 @@
-# Component Methods — Sessions Page: Session Detail Panel
+# Component Methods — Full Stack Pivot (Phase 0)
 
-**Note**: Signatures and high-level purpose only. Detailed business rules (exact debounce timing, drag-drop thresholds, state transition rules) are defined in Functional Design (Construction phase).
+Method signatures only — business rules (e.g., exact validation, error handling) are defined later
+in Functional Design, per unit.
 
-## SessionListRenderer (`js/sessions.js`)
+## `storage.js` (unchanged signatures)
+- `saveItem(type, item)` → saves a session/campaign/etc.; now writes to Supabase
+- `loadItem(type, id)` → returns one item by id
+- `deleteItem(type, id)` → deletes one item
+- `listItems(type)` → returns keys/ids for a type (existing gotcha applies: caller still needs `loadItem` per key — unchanged behavior, see CLAUDE.md known bugs)
 
-| Method | Input | Output | Purpose |
-|---|---|---|---|
-| `renderSessions(campaignId)` | campaign id | (renders DOM) | Renders all session cards for a campaign, summary always expanded |
-| `handleSessionDoubleClick(sessionId)` | session id | none | Calls `SessionPanel.open(sessionId)` |
-| `handleDeleteClick(sessionId)` | session id | none | Swaps the card into inline confirm state |
-| `confirmDelete(sessionId)` | session id | none | Deletes via `storage.js`, re-renders list |
-| `cancelDelete(sessionId)` | session id | none | Reverts the card to its normal state |
+## `supabaseClient.js`
+- `getClient()` → returns the singleton configured Supabase client instance
 
-## SessionPanel (`js/sessionPanel.js`) — namespace object
+## `auth.js`
+- `signup(email, password)` → creates a Supabase Auth account
+- `login(email, password)` → authenticates, sets session
+- `logout()` → clears session
+- `getCurrentUser()` → returns current logged-in user (or null)
+- `onAuthChange(callback)` → subscribes to login/logout events, for pages that need to react (e.g., redirect, update nav)
 
-| Method | Input | Output | Purpose |
-|---|---|---|---|
-| `SessionPanel.initFromURL()` | none (reads `location.search`) | none (renders) | On page load, restores open tabs/split panes from `open`/`split` URL params |
-| `SessionPanel.open(sessionId)` | session id | none | Opens a session as a new tab (or activates it if already open); updates URL |
-| `SessionPanel.closeTab(sessionId)` | session id | none | Closes that session's tab; updates URL; if it was the last tab, panel closes entirely |
-| `SessionPanel.switchTab(sessionId)` | session id | none | Makes that tab the active/visible one within its pane |
-| `SessionPanel.detachToSplit(sessionId)` | session id | none | Drags a tab out into a second side-by-side pane; updates `split` URL param |
-| `SessionPanel.mergeSplit(sessionId)` | session id | none | Drags a split pane's tab back into the main tab bar; clears `split` URL param |
-| `SessionPanel.resize(paneId, widthPx)` | pane id, pixel width | none | Resizes a pane's drawer width (in-memory only, not URL-persisted) |
-| `SessionPanel.handleFieldChange(sessionId, field, value)` | session id, field name, new value | none | Updates in-memory draft, debounces a `storage.js` save, then triggers `renderSessions()` so the list card stays current |
-| `SessionPanel._syncURL()` | none | none (internal) | Writes current `open`/`split` state to the URL via `history.replaceState` |
+## `visibilityToggle.js`
+- `renderVisibilityToggle(container, note, onChange)` → renders a toggle control for a given note; calls `onChange(newVisibility)` when changed
+- `isVisibleToPlayers(note)` → reads the note's visibility flag
+
+## `revisionHistory.js`
+- `renderRevisionHistory(container, noteId)` → renders the list of past revisions for a note
+- `restoreRevision(noteId, revisionId)` → restores a prior revision non-destructively (creates a new revision on top, per Story 10)
+
+## `campaignInvites.js`
+- `inviteMember(campaignId, email)` → invites a player by email
+- `revokeMember(campaignId, memberId)` → revokes a player's access
+- `listMembers(campaignId)` → returns active/pending/revoked members for the DM's management view

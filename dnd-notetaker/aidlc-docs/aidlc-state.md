@@ -24,7 +24,7 @@
 ## Extension Configuration
 | Extension | Enabled | Decided At |
 |---|---|---|
-| Security Baseline | No | Project Setup (2026-08-17) |
+| Security Baseline | Yes (was No; enabled by Ashton in Unit 0a NFR Requirements Q3) | Unit 0a NFR Requirements (2026-09-22) |
 | Resiliency Baseline | No | Project Setup (2026-08-17) |
 | Property-Based Testing | Partial (pure functions & data round-trips only, e.g. storage.js save/load) | Project Setup (2026-08-17) |
 
@@ -72,7 +72,17 @@
 - [x] Requirements Analysis (`aidlc-docs/inception/requirements/project-roadmap-requirements.md`, Minimal depth) — pending user approval
 - [x] User Stories (`aidlc-docs/inception/user-stories/personas.md`, `stories.md`) — approved (revised 4x: personal notes added, revocation semantics, per-page opt-in visibility)
 - [x] Workflow Planning (`aidlc-docs/inception/plans/execution-plan.md`) — generated, pending user approval. Roadmap: Phase 0a-e (Supabase/auth/storage migration/revisions/personal-notes+visibility/data migration) → Phase 3 (Characters) → Phase 4 (World) → Phase 5 (Polish).
-- [ ] Application Design — recommended EXECUTE next (new Supabase schema/RLS/auth components need identification)
-- [ ] Units Generation — recommended EXECUTE (formalizes the 8-unit roadmap table into unit-of-work artifacts)
+- [x] Application Design (`aidlc-docs/inception/application-design/`) — generated, pending user approval. New components: `supabaseClient.js`, `auth.js`, `visibilityToggle.js`, `revisionHistory.js`, `campaignInvites.js`; RLS policies documented as their own component; `storage.js`'s 4-function public API stays unchanged.
+- [x] Units Generation (`aidlc-docs/inception/application-design/unit-of-work*.md`) — approved. 8 units confirmed, code stays flat in `js/`, all 13 Phase 0 stories mapped 1:1 to units.
+
+## 🟢 CONSTRUCTION PHASE (unit: 0a — Supabase Setup & Auth)
+- [x] Functional Design — approved (`aidlc-docs/construction/0a-supabase-auth/functional-design/`)
+- [x] NFR Requirements — approved (`aidlc-docs/construction/0a-supabase-auth/nfr-requirements/`). Security Baseline enabled; hosting moving GitHub Pages -> Netlify/Cloudflare Pages; MFA added to 0a scope; CLAUDE.md decisions log updated.
+- [x] NFR Design — approved (`aidlc-docs/construction/0a-supabase-auth/nfr-design/`). Fail-fast/no-retry, defense-in-depth (client + RLS), shared errorHandler.js.
+- [x] Infrastructure Design — generated, pending approval (`aidlc-docs/construction/0a-supabase-auth/infrastructure-design/`). Cloudflare Pages (free tier, single env) + Supabase (US West, single project, free tier) + free-tier error tracking.
+- [ ] NFR Design — EXECUTE (follows NFR Requirements)
+- [ ] Infrastructure Design — EXECUTE (real cloud infra now exists: Supabase project setup/config)
+- [ ] Code Generation — EXECUTE (ALWAYS)
+- [ ] Build and Test — EXECUTE (ALWAYS)
 - [ ] Application Design — SKIPPED for now (no new components being architected until a phase is picked to build)
 - [ ] Units Generation — deferred until a specific phase is chosen to implement

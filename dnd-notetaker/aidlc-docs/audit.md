@@ -352,3 +352,194 @@
 **Context**: INCEPTION - Workflow Planning, Steps 1-9 — gate awaiting approval.
 
 ---
+
+## Workflow Planning — Approved
+**Timestamp**: 2026-09-22T01:05:00Z
+**User Input**: "Approve & continue"
+**AI Response**: Execution plan approved. Proceeding to Application Design.
+**Context**: INCEPTION - Workflow Planning → Application Design transition.
+
+---
+
+## Application Design — Plan Presented
+**Timestamp**: 2026-09-22T01:10:00Z
+**AI Response**: Created `aidlc-docs/inception/plans/application-design-plan.md` with 4 clarifying questions on component boundaries: (Q1) whether storage.js stays a single file or splits by domain as scope grows, (Q2) where auth state lives, (Q3) whether new UI pieces (visibility toggle, revision history, invites) are separate reusable files or built into sessionPanel.js, (Q4) whether RLS policies get their own documented component. Gated on answers before generating components.md/component-methods.md/services.md/component-dependency.md.
+**Context**: INCEPTION - Application Design, Steps 2-7 — gate awaiting answers.
+
+---
+
+## Application Design — Answers Received, Artifacts Generated
+**Timestamp**: 2026-09-22T01:15:00Z
+**User Input**: "check" (all 4 answers = A: storage.js stays single public API + new supabaseClient.js; new auth.js module; new UI pieces are separate reusable files; RLS gets its own documented component)
+**AI Response**: No ambiguity in answers. Generated `aidlc-docs/inception/application-design/components.md`, `component-methods.md`, `services.md`, `component-dependency.md`, `application-design.md`. New components: supabaseClient.js, auth.js, visibilityToggle.js, revisionHistory.js, campaignInvites.js, plus RLS documented as its own component. storage.js's 4-function public API stays unchanged for existing callers. Presenting completion message, gated on approval before Units Generation.
+**Context**: INCEPTION - Application Design, Steps 8-12 — gate awaiting approval.
+
+---
+
+## Application Design — Approved
+**Timestamp**: 2026-09-22T01:20:00Z
+**User Input**: "Approve & continue"
+**AI Response**: Application Design approved. Proceeding to Units Generation.
+**Context**: INCEPTION - Application Design → Units Generation transition.
+
+---
+
+## Units Generation — Part 1 Plan Presented
+**Timestamp**: 2026-09-22T01:25:00Z
+**AI Response**: Created `aidlc-docs/inception/plans/unit-of-work-plan.md`. Treated as monolith sequencing (solo dev, one unit at a time), formalizing the 8-unit roadmap already drafted in execution-plan.md. 2 clarifying questions embedded: (Q1) confirm/adjust the 8-unit boundaries, (Q2) code organization for new files (flat in js/ vs. new js/lib/ + js/components/ subfolders). Gated on answers before generating unit-of-work.md/dependency.md/story-map.md.
+**Context**: INCEPTION - Units Generation, Part 1 Planning, Steps 1-6 — gate awaiting answers.
+
+---
+
+## Units Generation — Part 2 Generation Complete
+**Timestamp**: 2026-09-22T01:30:00Z
+**User Input**: "A) keep the 8-unit breakdown, A) flat in js/"
+**AI Response**: No ambiguity. Generated `aidlc-docs/inception/application-design/unit-of-work.md` (8 units, code organization confirmed flat in js/), `unit-of-work-dependency.md` (dependency matrix + sequence diagram, noting 0c/0e can happen in either order), `unit-of-work-story-map.md` (all 13 Phase 0 stories mapped 1:1 to units 0a-0e; Phases 3/4/5 carry only high-level scope pending their own future story rounds). Presenting completion message, gated on approval before CONSTRUCTION PHASE begins on whichever unit Ashton picks first.
+**Context**: INCEPTION - Units Generation, Part 2, Steps 12-16 — gate awaiting approval.
+
+---
+
+## Units Generation — Approved; Construction Starts on Unit 0a
+**Timestamp**: 2026-09-22T01:35:00Z
+**User Input**: "Approve & continue, start with 0a"
+**AI Response**: Units Generation approved. INCEPTION phase complete for this roadmap request. Entering CONSTRUCTION PHASE per-unit loop for Unit 0a (Supabase Setup & Auth). Per-unit conditional stage assessment for 0a: Functional Design EXECUTE (new data models: users/campaigns/campaign_members, complex auth business logic), NFR Requirements EXECUTE (security considerations are central — this unit introduces auth and the RLS foundation everything else depends on), NFR Design EXECUTE (follows from NFR Requirements), Infrastructure Design EXECUTE (real cloud infra now exists — Supabase project setup/config — unlike the prior localStorage-only state where this was always skipped), Code Generation ALWAYS.
+**Context**: INCEPTION complete -> CONSTRUCTION PHASE, Unit 0a, stage assessment.
+
+---
+
+## Functional Design (Unit 0a) — Plan Presented
+**Timestamp**: 2026-09-22T01:40:00Z
+**AI Response**: Created `aidlc-docs/construction/plans/0a-supabase-auth-functional-design-plan.md`. 5 questions embedded: login method (password-only vs. + magic link), campaign role granularity, invite-before-signup mechanics (resolves the Story 3 open item carried over from Stories stage), password rule customization, duplicate-invite handling. Gated on answers before generating business-logic-model.md/business-rules.md/domain-entities.md/frontend-components.md.
+**Context**: CONSTRUCTION - Unit 0a, Functional Design, Steps 2-5 — gate awaiting answers.
+
+---
+
+## Functional Design (Unit 0a) — Artifacts Generated
+**Timestamp**: 2026-09-22T01:45:00Z
+**User Input**: "AAAAA" (Q1=A password-only login, Q2=A owner/player roles only, Q3=A pending-invite-before-signup allowed, Q4=A Supabase Auth defaults, Q5=A reject duplicate invite with simple message)
+**AI Response**: No ambiguity. Generated `aidlc-docs/construction/0a-supabase-auth/functional-design/`: domain-entities.md (User/Campaign/CampaignMember, with pending/active/revoked status), business-logic-model.md (signup/login/create-campaign/logout flows, including pending-invite auto-activation on signup), business-rules.md (duplicate-invite rejection, generic login error to prevent account enumeration, immutable campaign ownership), frontend-components.md (login.html/signup.html, reuses existing draft-card creation pattern and inline-error-not-popup convention from CLAUDE.md). Presenting completion message, gated on approval before NFR Requirements.
+**Context**: CONSTRUCTION - Unit 0a, Functional Design, Steps 6-9 — gate awaiting approval.
+
+---
+
+## Functional Design (Unit 0a) — Approved
+**Timestamp**: 2026-09-22T01:50:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Functional Design approved for Unit 0a. Proceeding to NFR Requirements.
+**Context**: CONSTRUCTION - Unit 0a, Functional Design → NFR Requirements transition.
+
+---
+
+## NFR Requirements (Unit 0a) — Plan Presented
+**Timestamp**: 2026-09-22T01:55:00Z
+**AI Response**: Created `aidlc-docs/construction/plans/0a-supabase-auth-nfr-requirements-plan.md`. 5 questions: expected scale, session/refresh policy, whether to formally enable Security Baseline now (revisiting the recommendation flagged back in Requirements Analysis), where the Supabase URL/anon key live, error monitoring approach. Gated on answers.
+**Context**: CONSTRUCTION - Unit 0a, NFR Requirements, Steps 2-5 — gate awaiting answers.
+
+---
+
+## NFR Requirements (Unit 0a) — Answers Received; Security Baseline Enabled; Conflicts Found
+**Timestamp**: 2026-09-22T02:00:00Z
+**User Input**: "filled" (file on disk was still blank; AI asked user to save) then "done" (Q1=A tiny scale, Q2=A Supabase default sessions, Q3=A enable Security Baseline, Q4=A hardcode URL + anon key in supabaseClient.js, Q5=A console-only logging)
+**AI Response**: Recorded Security Baseline as enabled in aidlc-state.md and loaded `extensions/security/baseline/security-baseline.md`. Answer analysis found conflicts between the newly enforced rules and other answers or the hosting setup. These are blocking findings under the extension:
+- SECURITY-03/SECURITY-14 (centralized logging + security alerting) vs. Q5 console-only
+- SECURITY-04 (HTTP security headers) vs. GitHub Pages, which cannot set custom response headers
+- SECURITY-12 (password min 8 + breached-password check) vs. Functional Design Q4 (Supabase defaults)
+- SECURITY-12 (MFA for admin accounts) — not yet in scope
+Recorded as requirements, not questions: the anon key is treated as a public identifier, compliant provided the service_role key never appears client-side (AI's reading, flagged for Ashton to object); the CDN-loaded Supabase JS must be version-pinned with SRI (SECURITY-10/13). Added follow-up questions Q6-Q9 to the plan file. NFR artifacts are not generated until they are answered.
+**Context**: CONSTRUCTION - Unit 0a, NFR Requirements, Step 5 — follow-up gate, blocking security findings open.
+
+---
+
+## NFR Requirements (Unit 0a) — Round 2 Answered, Artifacts Generated
+**Timestamp**: 2026-09-22T02:10:00Z
+**User Input**: "AAAA" (Q6=A add free-tier error tracker + Supabase's built-in logs, Q7=A move hosting to Netlify/Cloudflare Pages, Q8=A password min 8 + leaked-password protection, Q9=A build optional MFA in Unit 0a now)
+**AI Response**: No ambiguity. Generated `aidlc-docs/construction/0a-supabase-auth/nfr-requirements/nfr-requirements.md` (full SECURITY-01 through SECURITY-15 compliance pass: compliant, N/A, or resolved-via-decision for each) and `tech-stack-decisions.md`. Q7's answer reverses the GitHub Pages hosting decision recorded in CLAUDE.md — updated CLAUDE.md's Stack section and Decisions log accordingly (hosting migration + Security Baseline enablement + full-stack pivot summary), per the project's own rule to keep the Decisions log current. Presenting completion message with Security Compliance summary, gated on approval before NFR Design.
+**Context**: CONSTRUCTION - Unit 0a, NFR Requirements, Steps 6-9 — gate awaiting approval.
+
+---
+
+## NFR Requirements (Unit 0a) — Approved
+**Timestamp**: 2026-09-22T02:15:00Z
+**User Input**: "contine"
+**AI Response**: NFR Requirements approved for Unit 0a. Proceeding to NFR Design.
+**Context**: CONSTRUCTION - Unit 0a, NFR Requirements → NFR Design transition.
+
+---
+
+## NFR Design (Unit 0a) — Plan Presented
+**Timestamp**: 2026-09-22T02:20:00Z
+**AI Response**: Created `aidlc-docs/construction/plans/0a-supabase-auth-nfr-design-plan.md`. Most resilience/scalability patterns are N/A given Supabase-managed infra at tiny scale; 2 targeted questions: auto-retry vs. fail-immediately on Supabase call failure, and where the global error handler (SECURITY-15) lives. Gated on answers.
+**Context**: CONSTRUCTION - Unit 0a, NFR Design, Steps 2-5 — gate awaiting answers.
+
+---
+
+## NFR Design (Unit 0a) — Artifacts Generated
+**Timestamp**: 2026-09-22T02:25:00Z
+**User Input**: "A) fail immediately, B) errorHandler.js on every page" (Q2's letter didn't match its own option list, but the described content — shared errorHandler.js on every page — matches Q2's option A verbatim; treated as unambiguous, not a mismatch worth a follow-up)
+**AI Response**: Generated `aidlc-docs/construction/0a-supabase-auth/nfr-design/nfr-design-patterns.md` (fail-fast/no-retry pattern; defense-in-depth client-check + RLS pattern; fail-safe global error handler pattern) and `logical-components.md` (new errorHandler.js component; Supabase's own Auth/API logs as the security-event log; explicitly no queues/caches/circuit-breakers needed at this scale). Presenting completion message, gated on approval before Infrastructure Design.
+**Context**: CONSTRUCTION - Unit 0a, NFR Design, Steps 6-9 — gate awaiting approval.
+
+---
+
+## NFR Design (Unit 0a) — Approved
+**Timestamp**: 2026-09-22T02:30:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: NFR Design approved for Unit 0a. Proceeding to Infrastructure Design.
+**Context**: CONSTRUCTION - Unit 0a, NFR Design → Infrastructure Design transition.
+
+---
+
+## Infrastructure Design (Unit 0a) — Plan Presented
+**Timestamp**: 2026-09-22T02:35:00Z
+**AI Response**: Created `aidlc-docs/construction/plans/0a-supabase-auth-infrastructure-design-plan.md`. 5 questions: Netlify vs. Cloudflare Pages, single vs. separate dev/prod Supabase projects, Supabase region, custom domain vs. free subdomain, and resolving the leaked-password-protection paid-tier open item from NFR Requirements. Gated on answers.
+**Context**: CONSTRUCTION - Unit 0a, Infrastructure Design, Steps 2-5 — gate awaiting answers.
+
+---
+
+## Infrastructure Design (Unit 0a) — Answers Received, One Follow-Up
+**Timestamp**: 2026-09-22T02:40:00Z
+**User Input**: "BAAAA" (Q1=B Cloudflare Pages, Q2=A single Supabase project, Q3=A "closest to me" but no location given, Q4=A free subdomain, Q5=A skip leaked-password protection if it requires a paid plan)
+**AI Response**: Q3 is ambiguous — picked "closest to me" without stating a location, so no region can be selected yet. Added a follow-up question asking for rough location (US/Europe/other/no-preference). Not proceeding to artifact generation until answered.
+**Context**: CONSTRUCTION - Unit 0a, Infrastructure Design, Step 5 — follow-up gate.
+
+---
+
+## Infrastructure Design (Unit 0a) — Artifacts Generated
+**Timestamp**: 2026-09-22T02:45:00Z
+**User Input**: "west" (Q3-followup = US West)
+**AI Response**: Generated `aidlc-docs/construction/0a-supabase-auth/infrastructure-design/infrastructure-design.md` and `deployment-architecture.md`: Cloudflare Pages (single environment, free `*.pages.dev` subdomain) + single Supabase project in US West + Sentry-equivalent error tracking, all free-tier. Leaked-password-protection open item resolved: skip if it requires payment, documented as an accepted partial SECURITY-12 exception. Presenting completion message, gated on approval before Code Generation.
+**Context**: CONSTRUCTION - Unit 0a, Infrastructure Design, Steps 6-9 — gate awaiting approval.
+
+---
+
+## Infrastructure Design (Unit 0a) — Approved
+**Timestamp**: 2026-09-22T02:50:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Infrastructure Design approved for Unit 0a. Proceeding to Code Generation.
+**Context**: CONSTRUCTION - Unit 0a, Infrastructure Design → Code Generation transition.
+
+---
+
+## Code Generation (Unit 0a) — Reverse-Engineering Gap Found and Resolved
+**Timestamp**: 2026-09-22T02:55:00Z
+**AI Response**: Before writing the Code Generation plan, read the actual current source (`storage.js`, `campaigns.js`, `nav.js`, `index.html`) since formal Reverse Engineering was deferred earlier in this project. Found the real `storage.js` API is `saveItem(key, data)`/`loadItem(key)`/`deleteItem(key)`/`listItems(prefix)` — a flat, self-prefixed string-key store — not the `saveItem(type, item)`-style API Application Design's `component-methods.md` assumed. Also found `js/nav.js` and `js/campaigns.js` already exist (undocumented in CLAUDE.md), `js/app.js` does NOT exist (CLAUDE.md's file-structure listing is stale on this point), and `pages/campaigns.html` already exists. Asked Ashton via AskUserQuestion whether the Supabase primary key should reuse the existing string keys as-is, or use real UUIDs with a translation layer.
+**User Input**: "Switch to UUID primary keys"
+**AI Response**: Updated `domain-entities.md` (Unit 0a functional design): Campaign/CampaignMember get a UUID `id` plus a `legacy_key` text column holding the existing `"campaign_<timestamp>"` string; storage.js's public API stays unchanged for callers, internally querying by `legacy_key` instead of `id`. This resolves the gap without reopening the full Functional Design approval gate, since it's an implementation-level correction to already-approved business rules, not a new business rule. Proceeding to Code Generation Part 1 (Planning), now grounded in the actual current file structure.
+**Context**: CONSTRUCTION - Unit 0a, Code Generation, Step 1 (Analyze Unit Context) — gap resolved, proceeding to plan.
+
+---
+
+## Code Generation (Unit 0a) — Plan Presented (Part 1)
+**Timestamp**: 2026-09-22T03:00:00Z
+**AI Response**: Created `aidlc-docs/construction/plans/0a-supabase-auth-code-generation-plan.md`, 13 numbered steps: DB migration SQL (campaigns/campaign_members tables with legacy_key translation column), supabaseClient.js, auth.js (incl. pending-invite activation), storage.js modified in-place (hybrid: campaign_ keys -> Supabase, session_ keys stay localStorage until Unit 0b, explicitly commented as interim), errorHandler.js, login.html/signup.html (with data-testid attributes), nav.js extended for auth-awareness (no app.js exists, so nav.js is the natural home rather than inventing a new file), campaigns.js's existing save handler gets one field added (owner_id), script tag updates across index.html/campaigns.html, Cloudflare Pages _headers file, and a frontend-summary.md doc. Presenting plan summary, gated on approval before generation begins.
+**Context**: CONSTRUCTION - Unit 0a, Code Generation, Steps 5-7 — gate awaiting approval.
+
+---
+
+## Code Generation (Unit 0a) — Plan Approved
+**Timestamp**: 2026-09-22T03:05:00Z
+**User Input**: "Approve & continue"
+**AI Response**: Code Generation plan approved for Unit 0a. Beginning Part 2 - Generation.
+**Context**: CONSTRUCTION - Unit 0a, Code Generation, Part 1 -> Part 2 transition.
+
+---

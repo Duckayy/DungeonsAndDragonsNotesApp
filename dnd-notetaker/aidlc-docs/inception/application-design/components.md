@@ -1,37 +1,37 @@
-# Components — Sessions Page: Session Detail Panel
+# Components — Full Stack Pivot (Phase 0)
 
-## Component: SessionListRenderer
-**File**: `js/sessions.js` (existing, extended)
+## Existing Components (responsibility unchanged, implementation changes)
 
-**Purpose**: Render a campaign's session cards in the list view and handle list-level interactions (opening a session, hover-delete with inline confirmation).
+### `storage.js`
+- **Responsibility**: The single public data-access API the rest of the app calls. Unchanged surface: `saveItem`, `loadItem`, `deleteItem`, `listItems`.
+- **Change**: Internally now calls Supabase instead of reading/writing `localStorage`. Callers (`sessions.js`, `sessionPanel.js`, future `characters.js`/`world.js`) need no changes.
 
-**Responsibilities**:
-- Render each session as a card with summary always expanded (unchanged)
-- Show a delete button on hover; on click, swap that card's content to an inline "Delete this session? Confirm/Cancel" state
-- On confirm, delete via `storage.js` and re-render the list; on cancel, revert the card
-- On double-click, hand off to `SessionPanel.open(sessionId)` — the list itself no longer has an inline edit mode
+### `sessions.js` / `sessionPanel.js`
+- **Responsibility**: Unchanged (session list rendering, session detail panel/tabs/autosave).
+- **Change**: Session cards/panel now import and render the new `visibilityToggle.js` and `revisionHistory.js` UI pieces.
 
-**Does NOT own**: any panel/tab/split state — that's entirely `SessionPanel`'s responsibility.
+### `app.js`
+- **Responsibility**: Dashboard/home screen logic. Out of Phase 0's core scope, but nav needs to become auth-aware (show login/logout, current user).
 
----
+## New Components
 
-## Component: SessionPanel
-**File**: `js/sessionPanel.js` (new)
+### `supabaseClient.js`
+- **Responsibility**: Owns Supabase SDK initialization (URL + public key) and exports a single configured client instance. Nothing else touches the Supabase SDK directly — everything goes through `storage.js` or `auth.js`.
 
-**Purpose**: Owns the entire panel/tab/split subsystem — opening sessions in a resizable side drawer, tab management, drag-to-split, field editing, and autosave.
+### `auth.js`
+- **Responsibility**: Login/signup/logout and current-session state. Exposes `getCurrentUser()`, `login()`, `signup()`, `logout()`, `onAuthChange()`. Pages import this to gate UI (e.g., hide edit controls, redirect to login).
 
-**Responsibilities**:
-- Render the panel drawer (or two side-by-side drawers when split) with a tab bar
-- Track which sessions are open, which tab is active, and split arrangement
-- Sync open/split state to the URL query params (`open`, `split`) so refresh restores layout; restore from URL on page load
-- Render all editable fields (title, date, inGameDate, summary, tags) for the active session per open tab/pane
-- Debounce field edits and autosave via `storage.js`; after each save, trigger the list to re-render so the underlying card stays in sync
-- Handle panel resize (in-memory only, not URL-persisted)
-- Handle tab drag-to-split and merge-back-to-tab interactions
+### `visibilityToggle.js`
+- **Responsibility**: Reusable UI component: DM-facing control to mark a session/character/world page visible or hidden to players (Stories 5/6/6b). Reused by `sessionPanel.js` now, and by future `characters.js`/`world.js`.
 
-**Does NOT own**: session deletion (stays in `SessionListRenderer`), the session list rendering itself.
+### `revisionHistory.js`
+- **Responsibility**: Reusable UI component: view a note's revision list and restore an earlier version non-destructively (Stories 9/10). Reused across note types.
 
----
+### `campaignInvites.js`
+- **Responsibility**: Reusable UI component: DM invites a player by email, sees pending/active/revoked members, and revokes access (Stories 3/7).
 
-## Design Note (Open Decision)
-Per the approved plan, `open`/`split` URL params are the only panel state persisted across reload; resize width is not. If this assumption is wrong, flag it during review and it'll be revised before Functional Design locks in the state machine.
+### RLS Policies (Supabase, not a JS file)
+- **Responsibility**: The actual enforcement layer for every permission rule in `stories.md` — DM full access to their own campaign rows, player read-only access gated by the `visible_to_players` flag, player full access to their own personal-notes rows only, zero access once revoked. Documented as its own component (per Q4) because it's the real security boundary — the JS-level UI checks (hiding buttons, etc.) are UX convenience, not the actual protection.
+
+## Deferred (not built in Phase 0)
+- `characters.js`, `world.js` — remain stubs; they'll consume `storage.js`, `auth.js`, `visibilityToggle.js`, and `revisionHistory.js` unchanged when Phase 3/4 are picked up.
